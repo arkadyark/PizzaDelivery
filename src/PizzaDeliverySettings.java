@@ -15,8 +15,6 @@ public class PizzaDeliverySettings {
 	private String deliverySide;
 
 	public PizzaDeliverySettings() {
-		houseNumber = 0;
-		
 		while (true) {
 			LCD.clear();
 			System.out.println("Left pizza or right pizza?");
@@ -35,15 +33,15 @@ public class PizzaDeliverySettings {
 			System.out.println("Left, middle, or right road?");
 			int buttonID = Button.waitForAnyPress();
 			if (buttonID == Button.ID_ENTER) {
-				setRoadDirection("MIDDLE");
+				roadStartCoords = CENTER_ROAD_START_COORDS;
 				break;
 			}
 			if (buttonID == Button.ID_LEFT) {
-				setRoadDirection("LEFT");
+				roadStartCoords = LEFT_ROAD_START_COORDS;
 				break;
 			}
 			if (buttonID == Button.ID_RIGHT) {
-				setRoadDirection("RIGHT");
+				roadStartCoords = RIGHT_ROAD_START_COORDS;
 			}
 		}
 		
@@ -52,14 +50,15 @@ public class PizzaDeliverySettings {
 			System.out.println("Which side is the house on?");
 			int buttonID = Button.waitForAnyPress();
 			if (buttonID == Button.ID_LEFT) {
-				setPizzaDirection("LEFT");
+				deliverySide = "LEFT";
 				break;
 			}
 			if (buttonID == Button.ID_RIGHT) {
-				setPizzaDirection("RIGHT");
+				deliverySide = "RIGHT";
 			}
 		}
 		
+		houseNumber = 0;
 		while (true) {			
 			LCD.clear();
 			System.out.println("Which house number on that side?");
@@ -78,10 +77,14 @@ public class PizzaDeliverySettings {
 		}
 	}
 	
-	private void setRoadDirection(String string) {
-		
+	public void setPizzaDirection(String direction) {
+		if (direction == "LEFT") {
+			pizzaCoords = LEFT_PIZZA_COORDS;
+		} else if (direction == "RIGHT") {
+			pizzaCoords = RIGHT_PIZZA_COORDS;
+		}
 	}
-
+	
 	public void incrementHouseNumber() {
 		houseNumber++;
 	}
@@ -98,11 +101,11 @@ public class PizzaDeliverySettings {
 		return pizzaCoords;
 	}
 
-	public void setPizzaDirection(String direction) {
-		if (direction == "LEFT") {
-			pizzaCoords = LEFT_PIZZA_COORDS;
-		} else if (direction == "RIGHT") {
-			pizzaCoords = RIGHT_PIZZA_COORDS;
-		}
+	public double[] getRoadCoords() {
+		return roadStartCoords;
+	}
+	
+	public String getDeliverySide() {
+		return deliverySide;
 	}
 }

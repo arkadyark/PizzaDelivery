@@ -22,11 +22,19 @@ public class PizzaDelivery {
 	
 	// Define state variables 
 	private int targetHouse;
+	private double roadCoords[];
+	private double pizzaCoords[];
+	private String deliverySide;
+	
 	private double currentPosition[];
-	private double targetRoad[];
 
-	public PizzaDelivery(PizzaDeliverySettings inputs) {
-		targetHouse = inputs.getHouseNumber();
+	public PizzaDelivery(PizzaDeliverySettings settings) {
+		targetHouse = settings.getHouseNumber();
+		roadCoords = settings.getRoadCoords();
+		deliverySide = settings.getDeliverySide();
+		pizzaCoords = settings.getPizzaCoords();
+		
+		currentPosition = START;
 	}
 
 	private static PizzaDeliverySettings getInputs() {
@@ -55,7 +63,7 @@ public class PizzaDelivery {
 		boolean gotToTarget = false;
 		while (!gotToTarget) {
 			ObstacleDetector obstacleDetector = new ObstacleDetector();
-			PointToPointDriver driver = new PointToPointDriver(currentPosition, targetRoad, obstacleDetector);
+			PointToPointDriver driver = new PointToPointDriver(currentPosition, roadCoords, obstacleDetector);
 			gotToTarget = driver.driveUntilStopped();
 			if (gotToTarget) return;
 			ObstacleAvoider obstacleAvoider = new ObstacleAvoider();
