@@ -1,3 +1,5 @@
+import lejos.hardware.Button;
+import lejos.hardware.lcd.LCD;
 import lejos.hardware.motor.Motor;
 import lejos.hardware.motor.NXTRegulatedMotor;
 import lejos.hardware.port.SensorPort;
@@ -24,23 +26,13 @@ public class PizzaDelivery {
 	private double targetRoad[];
 
 	public PizzaDelivery(PizzaDeliverySettings inputs) {
-		targetHouse = inputs.getTargetHouse();
+		targetHouse = inputs.getHouseNumber();
 	}
 
 	private static PizzaDeliverySettings getInputs() {
 		PizzaDeliverySettings settings = new PizzaDeliverySettings();
 		// Add all inputs to settings
 		return settings;
-	}
-
-	private void deliver() {
-		driveToPizza();
-		pickUpPizza();
-		driveToRoad();
-		followRoadToHouse();
-		turnToFaceHouse();
-		dropOffPizza();
-		driveToStart();
 	}
 
 	private void driveToStart() {
@@ -77,6 +69,16 @@ public class PizzaDelivery {
 
 	private void driveToPizza() {
 		
+	}
+	
+	private void deliver() {
+		driveToPizza();
+		pickUpPizza();
+		driveToRoad();
+		followRoadToHouse();
+		turnToFaceHouse();
+		dropOffPizza();
+		driveToStart();
 	}
 
 	public static void main(String[] args) {
