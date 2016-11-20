@@ -24,7 +24,7 @@ public class PizzaDelivery {
 	private double pizzaCoords[];
 	private String deliverySide;
 	
-	private double currentPose[];
+	private KalmanFilterLocalizer currentPose;
 
 	public PizzaDelivery(PizzaDeliverySettings settings) {
 		targetHouse = settings.getHouseNumber();
@@ -32,7 +32,7 @@ public class PizzaDelivery {
 		deliverySide = settings.getDeliverySide();
 		pizzaCoords = settings.getPizzaCoords();
 		
-		currentPose = START;
+		currentPose = new KalmanFilterLocalizer(START, leftMotor, rightMotor, gyro);
 	}
 
 	private static PizzaDeliverySettings getInputs() {
@@ -40,7 +40,7 @@ public class PizzaDelivery {
 	}
 	
 	private void driveToPizza() {
-		PointToPointDriver driver = new PointToPointDriver(currentPose, pizzaCoords);
+		PointToPointDriver driver = new PointToPointDriver(currentPose.getPose(), pizzaCoords);
 		driver.driveUntilStopped();
 	}
 
@@ -52,7 +52,7 @@ public class PizzaDelivery {
 		boolean gotToTarget = false;
 		while (!gotToTarget) {
 			ObstacleDetector obstacleDetector = new ObstacleDetector();
-			PointToPointDriver driver = new PointToPointDriver(currentPose, roadCoords, obstacleDetector);
+			PointToPointDriver driver = new PointToPointDriver(currentPose.getPose(), roadCoords, obstacleDetector);
 			gotToTarget = driver.driveUntilStopped();
 			if (gotToTarget) return;
 			ObstacleAvoider obstacleAvoider = new ObstacleAvoider();
@@ -67,13 +67,14 @@ public class PizzaDelivery {
 	}
 	
 	private void turnToFaceHouse() {
+		double desiredPose[] = currentPose.getPose();
 		if (deliverySide == "LEFT") {
-			double desiredPose[] = {currentPose[0], currentPose[1], currentPose[2] + 90};
-			PointToPointDriver driver = new PointToPointDriver(currentPose, desiredPose);
+			desiredPose[2] += 90;
+			PointToPointDriver driver = new PointToPointDriver(currentPose.getPose(), desiredPose);
 			driver.driveUntilStopped();
 		} else if (deliverySide == "RIGHT") {
-			double desiredPose[] = {currentPose[0], currentPose[1], currentPose[2] - 90};
-			PointToPointDriver driver = new PointToPointDriver(currentPose, desiredPose);
+			desiredPose[2] -=  - 90;
+			PointToPointDriver driver = new PointToPointDriver(currentPose.getPose(), desiredPose);
 			driver.driveUntilStopped();
 		}
 	}
@@ -83,7 +84,7 @@ public class PizzaDelivery {
 	}
 
 	private void driveToStart() {
-		PointToPointDriver driver = new PointToPointDriver(currentPose, START);
+		PointToPointDriver driver = new PointToPointDriver(currentPose.getPose(), START);
 		driver.driveUntilStopped();
 	}
 
