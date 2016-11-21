@@ -1,14 +1,17 @@
+import lejos.hardware.sensor.EV3UltrasonicSensor;
 
 public class ObstacleDetector implements Interruptor {
-	/***
-	 * TODO:
-	 * - Implement detection of obstacles in our path with appropriate threshold
-	 */
+	private static final float OBSTACLE_THRESHOLD = 0.2f;
+	
+	private EV3UltrasonicSensor ultrasonic;
 
+	ObstacleDetector(EV3UltrasonicSensor ultrasonic) {
+		this.ultrasonic = ultrasonic;
+	}
 	
 	@Override
 	public boolean isFinished() {
-		return false;
+		float distance = PizzaDeliveryUtils.getDistance(ultrasonic);
+		return distance < OBSTACLE_THRESHOLD;
 	}
-
 }

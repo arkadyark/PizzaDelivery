@@ -7,8 +7,6 @@ public class ObstacleAvoider {
 	 * - Make sure we don't hit another obstacle as we avoid this one
 	 */
 
-
-	public void drivePastObstacle() {		
+	public void drivePastObstacle() {
 	}
-
 }

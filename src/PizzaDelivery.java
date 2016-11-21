@@ -18,7 +18,7 @@ public class PizzaDelivery {
 	static NXTRegulatedMotor rightMotor = Motor.C;
 	static NXTRegulatedMotor armMotor = Motor.D;
 	
-	// Define state variables 
+	// Define state variables
 	private int targetHouse;
 	private double roadCoords[];
 	private double pizzaCoords[];
@@ -51,7 +51,7 @@ public class PizzaDelivery {
 	private void driveToRoad() {
 		boolean gotToTarget = false;
 		while (!gotToTarget) {
-			ObstacleDetector obstacleDetector = new ObstacleDetector();
+			ObstacleDetector obstacleDetector = new ObstacleDetector(ultrasonic);
 			PointToPointDriver driver = new PointToPointDriver(currentPose.getPose(), roadCoords, obstacleDetector);
 			gotToTarget = driver.driveUntilStopped();
 			if (gotToTarget) return;
@@ -61,7 +61,7 @@ public class PizzaDelivery {
 	}
 
 	private void followRoadToHouse() {
-		HouseCounter houseCounter =  new HouseCounter(targetHouse);
+		HouseCounter houseCounter =  new HouseCounter(targetHouse, ultrasonic);
 		LineFollower follower = new LineFollower(houseCounter);
 		follower.driveUntilStopped();
 	}
@@ -84,8 +84,15 @@ public class PizzaDelivery {
 	}
 
 	private void driveToStart() {
-		PointToPointDriver driver = new PointToPointDriver(currentPose.getPose(), START);
-		driver.driveUntilStopped();
+		boolean gotToTarget = false;
+		while (!gotToTarget) {
+			ObstacleDetector obstacleDetector = new ObstacleDetector(ultrasonic);
+			PointToPointDriver driver = new PointToPointDriver(currentPose.getPose(), START, obstacleDetector);
+			gotToTarget = driver.driveUntilStopped();
+			if (gotToTarget) return;
+			ObstacleAvoider obstacleAvoider = new ObstacleAvoider();
+			obstacleAvoider.drivePastObstacle();
+		}
 	}
 
 	private void deliver() {
