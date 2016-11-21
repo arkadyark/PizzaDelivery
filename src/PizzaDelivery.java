@@ -42,6 +42,7 @@ public class PizzaDelivery {
 	private void driveToPizza() {
 		PointToPointDriver driver = new PointToPointDriver(currentPose.getPose(), pizzaCoords);
 		driver.driveUntilStopped();
+		currentPose.setPose(pizzaCoords);
 	}
 
 	private void pickUpPizza() {
@@ -58,6 +59,7 @@ public class PizzaDelivery {
 			ObstacleAvoider obstacleAvoider = new ObstacleAvoider();
 			obstacleAvoider.drivePastObstacle();
 		}
+		currentPose.setPose(roadCoords);
 	}
 
 	private void followRoadToHouse() {
@@ -73,7 +75,7 @@ public class PizzaDelivery {
 			PointToPointDriver driver = new PointToPointDriver(currentPose.getPose(), desiredPose);
 			driver.driveUntilStopped();
 		} else if (deliverySide == "RIGHT") {
-			desiredPose[2] -=  - 90;
+			desiredPose[2] -= 90;
 			PointToPointDriver driver = new PointToPointDriver(currentPose.getPose(), desiredPose);
 			driver.driveUntilStopped();
 		}

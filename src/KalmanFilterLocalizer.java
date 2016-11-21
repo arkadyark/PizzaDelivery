@@ -32,7 +32,11 @@ public class KalmanFilterLocalizer {
 		tachoCount = tachometerTicks;
 	}
 
-	double[] getPose() {
+	public double[] getPose() {
 		return currentPose;
+	}
+	
+	public void setPose(double newPose[]) {
+		this.currentPose = newPose;
 	}
 }
