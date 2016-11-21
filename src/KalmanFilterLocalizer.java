@@ -19,6 +19,7 @@ public class KalmanFilterLocalizer {
 	}
 	
 	public void updateAngle() {
+		// If necessary, use a Kalman filter to update this
 		currentPose[2] = PizzaDeliveryUtils.getAngle(gyro);
 	}
 	

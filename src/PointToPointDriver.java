@@ -16,7 +16,7 @@ public class PointToPointDriver {
 	public PointToPointDriver(KalmanFilterLocalizer currentPose, double targetPose[], 
 			NXTRegulatedMotor leftMotor, NXTRegulatedMotor rightMotor, Interruptor interruptor) {
 		this.leftMotor = leftMotor;
-		this.rightMotor = rightMotor;	
+		this.rightMotor = rightMotor;
 		leftMotor.setSpeed(PizzaDeliveryUtils.SPEED);
 		rightMotor.setSpeed(PizzaDeliveryUtils.SPEED);
 		
@@ -29,16 +29,18 @@ public class PointToPointDriver {
 		theta = targetPose[2] - currentPose.getPose()[2];
 		
 		// For theta, convert the angle to be between -180 and 180
-		theta = theta % 360f;
+		theta %= 360f;
 		if(theta > 180) {
 			theta -= 360;
 		}
 	}
 	
 	
-	private void turn(double degrees){	
+	private void turn(double degrees){
+		// Can use gyroscope/Kalman filter reading and put this in a loop to get it more accurate
 		rightMotor.rotate((int)Math.round(degrees), true);
 		leftMotor.rotate((int)Math.round(-degrees));
+		currentPose.updateAngle();
 	}
 	
 	private boolean straight(double degrees){		
@@ -69,13 +71,9 @@ public class PointToPointDriver {
 	public boolean driveUntilStopped() {
 		double rise = Math.atan2(y, x);
 		turn(rise*PizzaDeliveryUtils.DEG_TO_DEG);
-		currentPose.updateAngle();
-		
 		boolean interrupted = straight(Math.pow((Math.pow(x,  2) + Math.pow(y, 2)), .5)*PizzaDeliveryUtils.DIST_TO_DEG);
-		
 		if (!interrupted) {
 			turn((theta-rise)*PizzaDeliveryUtils.DEG_TO_DEG);
-			currentPose.updateAngle();
 		}
 		return interrupted;
 	}
