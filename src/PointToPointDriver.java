@@ -1,77 +1,83 @@
-import lejos.hardware.motor.Motor;
+import lejos.hardware.motor.NXTRegulatedMotor;
 
 public class PointToPointDriver {
-	/***
-	 * TODO:
-	 * - Implement PointToPoint control from lab 4
-	 * - Implement support for interruptions from the Interruptor, if there is one
-	 */
 
-	public static double DEG_TO_DEG = (9+14.5)/(2*5.5);
-	public static double DIST_TO_DEG = 360/(Math.PI*5.5);
-	public static int SPEED = 200;
 	public Interruptor interruptor;
 	public double x, y, theta;
+	private KalmanFilterLocalizer currentPose;
+	private NXTRegulatedMotor leftMotor;
+	private NXTRegulatedMotor rightMotor;
 	
-	
-	public void turn(double degrees){	
-		Motor.C.rotate((int)Math.round(degrees), true);
-		Motor.B.rotate((int)Math.round(-degrees));
+	public PointToPointDriver(KalmanFilterLocalizer currentPose, double[] targetPose, 
+			NXTRegulatedMotor leftMotor, NXTRegulatedMotor rightMotor) {
+		this(currentPose, targetPose, leftMotor, rightMotor, null);
 	}
 	
-	public boolean straight(double degrees){		
-		if(interruptor == null) {
-			Motor.C.rotate((int)Math.round(degrees), true);
-			Motor.B.rotate((int)Math.round(degrees));
-		}
-		else {
-			Motor.B.resetTachoCount();
-			Motor.B.forward();
-			Motor.C.forward();
-			while(Motor.B.getTachoCount() < degrees) {
-				if(interruptor.isFinished()) {
-					Motor.B.stop();
-					Motor.C.stop();
-					return false;
-				}
-			}
-			Motor.B.stop();
-			Motor.C.stop();
-		}
-		return true;
-	}
-
-	public boolean pose(double x, double y, double theta){
-		double rise = Math.atan2(y, x);
-		boolean interrupted;
-		turn(rise*DEG_TO_DEG);
-		interrupted = straight(Math.pow((Math.pow(x,  2) + Math.pow(y, 2)), .5)*DIST_TO_DEG);
-		turn((theta-rise)*DEG_TO_DEG);
-		return interrupted;
-	}
-	
-	public PointToPointDriver(double currentPose[], double targetPose[], Interruptor interruptor) {
-		this(currentPose, targetPose);
+	public PointToPointDriver(KalmanFilterLocalizer currentPose, double targetPose[], 
+			NXTRegulatedMotor leftMotor, NXTRegulatedMotor rightMotor, Interruptor interruptor) {
+		this.leftMotor = leftMotor;
+		this.rightMotor = rightMotor;	
+		leftMotor.setSpeed(PizzaDeliveryUtils.SPEED);
+		rightMotor.setSpeed(PizzaDeliveryUtils.SPEED);
+		
+		this.currentPose = currentPose;
 		this.interruptor = interruptor;
-	}
-
-	public PointToPointDriver(double[] currentPose, double[] targetPose) {
+		
 		// Change in pose
-		x = targetPose[0] - currentPose[0];
-		y = targetPose[1] - currentPose[1];
-		theta = targetPose[2] - currentPose[2];
+		x = targetPose[0] - currentPose.getPose()[0];
+		y = targetPose[1] - currentPose.getPose()[1];
+		theta = targetPose[2] - currentPose.getPose()[2];
 		
 		// For theta, convert the angle to be between -180 and 180
 		theta = theta % 360f;
 		if(theta > 180) {
 			theta -= 360;
 		}
-		Motor.B.setSpeed(SPEED);
-		Motor.C.setSpeed(SPEED);
+	}
+	
+	
+	private void turn(double degrees){	
+		rightMotor.rotate((int)Math.round(degrees), true);
+		leftMotor.rotate((int)Math.round(-degrees));
+	}
+	
+	private boolean straight(double degrees){		
+		if(interruptor == null) {
+			rightMotor.rotate((int)Math.round(degrees), true);
+			leftMotor.rotate((int)Math.round(degrees));
+		}
+		else {
+			int startTachoCount = leftMotor.getTachoCount();
+			leftMotor.forward();
+			rightMotor.forward();
+			while(leftMotor.getTachoCount() - startTachoCount < degrees) {
+				if(interruptor.isFinished()) {
+					leftMotor.stop();
+					rightMotor.stop();
+					currentPose.updateDistance();
+					return false;
+				}
+			}
+		}
+		
+		leftMotor.stop();
+		rightMotor.stop();
+		currentPose.updateDistance();
+		return true;
 	}
 
 	public boolean driveUntilStopped() {
-		return pose(x, y, theta);
+		double rise = Math.atan2(y, x);
+		turn(rise*PizzaDeliveryUtils.DEG_TO_DEG);
+		currentPose.updateAngle();
+		
+		boolean interrupted = straight(Math.pow((Math.pow(x,  2) + Math.pow(y, 2)), .5)*PizzaDeliveryUtils.DIST_TO_DEG);
+		
+		if (!interrupted) {
+			turn((theta-rise)*PizzaDeliveryUtils.DEG_TO_DEG);
+			currentPose.updateAngle();
+		}
+		return interrupted;
 	}
 
 }

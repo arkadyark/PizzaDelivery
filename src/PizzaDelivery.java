@@ -8,12 +8,13 @@ import lejos.hardware.sensor.EV3UltrasonicSensor;
 public class PizzaDelivery {
 	private static final double START[] = {0, 0, 0};
 
-	// Define sensors and actuators
+	// Define sensors
 	static EV3UltrasonicSensor ultrasonic = new EV3UltrasonicSensor(SensorPort.S1);
 	static EV3ColorSensor color = new EV3ColorSensor(SensorPort.S2);
 	static EV3GyroSensor gyro = new EV3GyroSensor(SensorPort.S3);
 	
-	static NXTRegulatedMotor ultraSonicMotor = Motor.A;
+	// Define actuators
+	static NXTRegulatedMotor ultrasonicMotor = Motor.A;
 	static NXTRegulatedMotor leftMotor = Motor.B;
 	static NXTRegulatedMotor rightMotor = Motor.C;
 	static NXTRegulatedMotor armMotor = Motor.D;
@@ -40,7 +41,7 @@ public class PizzaDelivery {
 	}
 	
 	private void driveToPizza() {
-		PointToPointDriver driver = new PointToPointDriver(currentPose.getPose(), pizzaCoords);
+		PointToPointDriver driver = new PointToPointDriver(currentPose, pizzaCoords, leftMotor, rightMotor);
 		driver.driveUntilStopped();
 		currentPose.setPose(pizzaCoords);
 	}
@@ -53,17 +54,16 @@ public class PizzaDelivery {
 		boolean gotToTarget = false;
 		while (!gotToTarget) {
 			ObstacleDetector obstacleDetector = new ObstacleDetector(ultrasonic);
-			PointToPointDriver driver = new PointToPointDriver(currentPose.getPose(), roadCoords, obstacleDetector);
+			PointToPointDriver driver = new PointToPointDriver(currentPose, roadCoords, leftMotor, rightMotor, obstacleDetector);
 			gotToTarget = driver.driveUntilStopped();
-			if (gotToTarget) return;
+			if (gotToTarget) break;
 			ObstacleAvoider obstacleAvoider = new ObstacleAvoider();
 			obstacleAvoider.drivePastObstacle();
 		}
-		currentPose.setPose(roadCoords);
 	}
 
 	private void followRoadToHouse() {
-		HouseCounter houseCounter =  new HouseCounter(targetHouse, ultrasonic);
+		HouseCounter houseCounter =  new HouseCounter(targetHouse, deliverySide, ultrasonic, ultrasonicMotor);
 		LineFollower follower = new LineFollower(leftMotor, rightMotor, color, houseCounter);
 		follower.driveUntilStopped();
 	}
@@ -72,11 +72,11 @@ public class PizzaDelivery {
 		double desiredPose[] = currentPose.getPose();
 		if (deliverySide == "LEFT") {
 			desiredPose[2] += 90;
-			PointToPointDriver driver = new PointToPointDriver(currentPose.getPose(), desiredPose);
+			PointToPointDriver driver = new PointToPointDriver(currentPose, desiredPose, leftMotor, rightMotor);
 			driver.driveUntilStopped();
 		} else if (deliverySide == "RIGHT") {
 			desiredPose[2] -= 90;
-			PointToPointDriver driver = new PointToPointDriver(currentPose.getPose(), desiredPose);
+			PointToPointDriver driver = new PointToPointDriver(currentPose, desiredPose, leftMotor, rightMotor);
 			driver.driveUntilStopped();
 		}
 	}
@@ -89,7 +89,7 @@ public class PizzaDelivery {
 		boolean gotToTarget = false;
 		while (!gotToTarget) {
 			ObstacleDetector obstacleDetector = new ObstacleDetector(ultrasonic);
-			PointToPointDriver driver = new PointToPointDriver(currentPose.getPose(), START, obstacleDetector);
+			PointToPointDriver driver = new PointToPointDriver(currentPose, START, leftMotor, rightMotor, obstacleDetector);
 			gotToTarget = driver.driveUntilStopped();
 			if (gotToTarget) return;
 			ObstacleAvoider obstacleAvoider = new ObstacleAvoider();

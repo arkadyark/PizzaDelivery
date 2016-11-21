@@ -18,18 +18,16 @@ public class KalmanFilterLocalizer {
 		tachoCount = 0;
 	}
 	
-	public void update() {
-		// Simple odometry, no Kalman filtering being done here (yet)
-		// TODO: Add conversion factors from wheel rotation to position change
-		// TODO: Add Kalman filtering to get accurate theta
-		double v_average = 0.5*(leftMotor.getRotationSpeed() + rightMotor.getRotationSpeed());
-		double v_difference = (rightMotor.getRotationSpeed() - leftMotor.getRotationSpeed());
-		double tachometerTicks = 0.5*(leftMotor.getTachoCount() + rightMotor.getTachoCount());
-		double tachometerDelta = tachometerTicks - tachoCount;
-		currentPose[0] += v_average*Math.sin(currentPose[2])*tachometerDelta;
-		currentPose[1] += v_average*Math.cos(currentPose[2])*tachometerDelta;
-		currentPose[2] += v_difference*tachometerDelta;
-		tachoCount = tachometerTicks;
+	public void updateAngle() {
+		currentPose[2] = PizzaDeliveryUtils.getAngle(gyro);
+	}
+	
+	public void updateDistance() {
+		double tachoTicks = 0.5*(leftMotor.getTachoCount() + rightMotor.getTachoCount());
+		double tachoDifference = tachoTicks - tachoCount;
+		currentPose[0] += Math.cos(currentPose[2])*tachoDifference/PizzaDeliveryUtils.DIST_TO_DEG;
+		currentPose[1] += Math.sin(currentPose[2])*tachoDifference/PizzaDeliveryUtils.DIST_TO_DEG;
+		tachoCount = tachoTicks;
 	}
 
 	public double[] getPose() {

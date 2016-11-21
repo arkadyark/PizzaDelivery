@@ -2,7 +2,6 @@ import lejos.hardware.Button;
 import lejos.hardware.lcd.LCD;
 
 public class PizzaDeliverySettings {
-
 	private static final double[] LEFT_PIZZA_COORDS = {-60.7, 6.2};
 	private static final double[] RIGHT_PIZZA_COORDS = {60.7, 6.2};
 	private static final double[] LEFT_ROAD_START_COORDS = {-39, 216.6, 30};

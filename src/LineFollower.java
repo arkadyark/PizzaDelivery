@@ -4,9 +4,7 @@ import lejos.hardware.sensor.EV3ColorSensor;
 public class LineFollower {
 	/***
 	 * TODO:
-	 * - Implement P controller to drive along line (Lab 3) reading from ColorSensor
 	 * - Tune P controller/put in tuning from Lab 3/4
-	 * - Implement interruption support, poll interruptor periodically
 	 */
 
 	private NXTRegulatedMotor leftMotor;
@@ -14,9 +12,8 @@ public class LineFollower {
 	private EV3ColorSensor color;
 	private Interruptor interruptor;
 	
-	static float desired = 0.12f;
-	private float kP;
-	private float speed;
+	private static float desired = 0.12f;
+	private static float kP = 300;
 
 	public LineFollower(NXTRegulatedMotor rightMotor, NXTRegulatedMotor leftMotor, EV3ColorSensor color, Interruptor interruptor) {
 		this.leftMotor = leftMotor;
@@ -27,24 +24,16 @@ public class LineFollower {
 
 	public void driveUntilStopped() {
 		while (!interruptor.isFinished()){
-			float current = getReflectedLight();
+			float current = PizzaDeliveryUtils.getReflectedLight(color);
 			float error = (desired - current);			
 			float correction = kP*error;
 			
-			leftMotor.setSpeed(Math.round(speed + correction/2.0));
+			leftMotor.setSpeed(Math.round(PizzaDeliveryUtils.SPEED + correction/2.0));
 			leftMotor.forward();
-			rightMotor.setSpeed(Math.round(speed - correction/2.0));
+			rightMotor.setSpeed(Math.round(PizzaDeliveryUtils.SPEED - correction/2.0));
 			rightMotor.forward();
 		}
 		leftMotor.stop();
 		rightMotor.stop();
 	}
-	
-	protected float getReflectedLight() {
-		int sampleSize = color.sampleSize();
-		float[] redsample = new float[sampleSize];
-		color.getRedMode().fetchSample(redsample, 0);
-		return redsample[0];
-	}	
-
 }
