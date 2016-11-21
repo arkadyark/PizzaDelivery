@@ -4,20 +4,21 @@ import lejos.hardware.port.SensorPort;
 import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.hardware.sensor.EV3GyroSensor;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
+import lejos.utility.Delay;
 
 public class PizzaDelivery {
 	private static final double START[] = {0, 0, 0};
 
 	// Define sensors
-	static EV3UltrasonicSensor ultrasonic = new EV3UltrasonicSensor(SensorPort.S1);
-	static EV3ColorSensor color = new EV3ColorSensor(SensorPort.S2);
-	static EV3GyroSensor gyro = new EV3GyroSensor(SensorPort.S3);
+	private static EV3UltrasonicSensor ultrasonic = new EV3UltrasonicSensor(SensorPort.S1);
+	private static EV3ColorSensor color = new EV3ColorSensor(SensorPort.S2);
+	private static EV3GyroSensor gyro = new EV3GyroSensor(SensorPort.S4);
 	
 	// Define actuators
-	static NXTRegulatedMotor ultrasonicMotor = Motor.A;
-	static NXTRegulatedMotor leftMotor = Motor.B;
-	static NXTRegulatedMotor rightMotor = Motor.C;
-	static NXTRegulatedMotor armMotor = Motor.D;
+	private static NXTRegulatedMotor ultrasonicMotor = Motor.B;
+	private static NXTRegulatedMotor leftMotor = Motor.A;
+	private static NXTRegulatedMotor rightMotor = Motor.D;
+	private static NXTRegulatedMotor armMotor = Motor.C;
 	
 	// Define state variables
 	private int targetHouse;
@@ -36,18 +37,23 @@ public class PizzaDelivery {
 		currentPose = new KalmanFilterLocalizer(START, leftMotor, rightMotor, gyro);
 	}
 
-	private static PizzaDeliverySettings getInputs() {
-		return new PizzaDeliverySettings();
+	private void initialize() {
+		armMotor.rotateTo(0);
+		gyro.reset();
+		Delay.msDelay(1000);
 	}
 	
 	private void driveToPizza() {
 		PointToPointDriver driver = new PointToPointDriver(currentPose, pizzaCoords, leftMotor, rightMotor);
 		driver.driveUntilStopped();
-		currentPose.setPose(pizzaCoords);
 	}
 
 	private void pickUpPizza() {
 		armMotor.rotateTo(180);
+		leftMotor.rotate((int) Math.round(-15/PizzaDeliveryUtils.DIST_TO_DEG), true);
+		rightMotor.rotate((int) Math.round(-15/PizzaDeliveryUtils.DIST_TO_DEG));
+		currentPose.updateAngle();
+		currentPose.updateDistance();
 	}
 
 	private void driveToRoad() {
@@ -57,7 +63,7 @@ public class PizzaDelivery {
 			PointToPointDriver driver = new PointToPointDriver(currentPose, roadCoords, leftMotor, rightMotor, obstacleDetector);
 			gotToTarget = driver.driveUntilStopped();
 			if (gotToTarget) break;
-			ObstacleAvoider obstacleAvoider = new ObstacleAvoider();
+			ObstacleAvoider obstacleAvoider = new ObstacleAvoider(currentPose, leftMotor, rightMotor, ultrasonic, ultrasonicMotor);
 			obstacleAvoider.drivePastObstacle();
 		}
 	}
@@ -92,12 +98,13 @@ public class PizzaDelivery {
 			PointToPointDriver driver = new PointToPointDriver(currentPose, START, leftMotor, rightMotor, obstacleDetector);
 			gotToTarget = driver.driveUntilStopped();
 			if (gotToTarget) return;
-			ObstacleAvoider obstacleAvoider = new ObstacleAvoider();
+			ObstacleAvoider obstacleAvoider = new ObstacleAvoider(currentPose, leftMotor, rightMotor, ultrasonic, ultrasonicMotor);
 			obstacleAvoider.drivePastObstacle();
 		}
 	}
 
 	private void deliver() {
+		initialize();
 		driveToPizza();
 		pickUpPizza();
 		driveToRoad();
@@ -108,7 +115,8 @@ public class PizzaDelivery {
 	}
 
 	public static void main(String[] args) {
-		PizzaDeliverySettings settings = getInputs();
+		//PizzaDeliverySettings settings = new PizzaDeliverySettings();
+		PizzaDeliverySettings settings = new PizzaDeliverySettings(true);
 		PizzaDelivery delivery = new PizzaDelivery(settings);
 		delivery.deliver();
 	}

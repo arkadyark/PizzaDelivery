@@ -2,11 +2,11 @@ import lejos.hardware.Button;
 import lejos.hardware.lcd.LCD;
 
 public class PizzaDeliverySettings {
-	private static final double[] LEFT_PIZZA_COORDS = {-60.7, 6.2};
-	private static final double[] RIGHT_PIZZA_COORDS = {60.7, 6.2};
-	private static final double[] LEFT_ROAD_START_COORDS = {-39, 216.6, 30};
-	private static final double[] CENTER_ROAD_START_COORDS = {0, 216.6, 0};
-	private static final double[] RIGHT_ROAD_START_COORDS = {39, 216.6, -30};
+	private static final double[] LEFT_PIZZA_COORDS = {6.2, 41.7, 90};
+	private static final double[] RIGHT_PIZZA_COORDS = {6.2, -41.7, -90};
+	private static final double[] LEFT_ROAD_START_COORDS = {216.6, 39, 30};
+	private static final double[] CENTER_ROAD_START_COORDS = {216.6, 0, 0};
+	private static final double[] RIGHT_ROAD_START_COORDS = {216.6, -39, -30};
 
 	private int houseNumber;
 	private double[] pizzaCoords;
@@ -15,7 +15,7 @@ public class PizzaDeliverySettings {
 
 	public PizzaDeliverySettings() {
 		while (true) {
-			LCD.clear();
+			LCD.clearDisplay();
 			System.out.println("Left pizza or right pizza?");
 			int buttonID = Button.waitForAnyPress();
 			if (buttonID == Button.ID_LEFT) {
@@ -24,11 +24,12 @@ public class PizzaDeliverySettings {
 			}
 			if (buttonID == Button.ID_RIGHT) {
 				setPizzaDirection("RIGHT");
+				break;
 			}
 		}
 		
 		while (true) {			
-			LCD.clear();
+			LCD.clearDisplay();
 			System.out.println("Left, middle, or right road?");
 			int buttonID = Button.waitForAnyPress();
 			if (buttonID == Button.ID_ENTER) {
@@ -41,11 +42,12 @@ public class PizzaDeliverySettings {
 			}
 			if (buttonID == Button.ID_RIGHT) {
 				roadStartCoords = RIGHT_ROAD_START_COORDS;
+				break;
 			}
 		}
 		
 		while (true) {			
-			LCD.clear();
+			LCD.clearDisplay();
 			System.out.println("Which side is the house on?");
 			int buttonID = Button.waitForAnyPress();
 			if (buttonID == Button.ID_LEFT) {
@@ -54,13 +56,15 @@ public class PizzaDeliverySettings {
 			}
 			if (buttonID == Button.ID_RIGHT) {
 				deliverySide = "RIGHT";
+				break;
+				
 			}
 		}
 		
 		houseNumber = 0;
+		LCD.clearDisplay();
+		System.out.println("Which house number on that side?");
 		while (true) {			
-			LCD.clear();
-			System.out.println("Which house number on that side?");
 			int buttonID = Button.waitForAnyPress();
 			if (buttonID == Button.ID_UP) {
 				incrementHouseNumber();
@@ -74,6 +78,14 @@ public class PizzaDeliverySettings {
 				break;
 			}
 		}
+	}
+	
+	public PizzaDeliverySettings(boolean useDefaults) {
+		setPizzaDirection("LEFT");
+		roadStartCoords = LEFT_ROAD_START_COORDS;
+		deliverySide = "LEFT";
+		incrementHouseNumber();
+		incrementHouseNumber();
 	}
 	
 	public void setPizzaDirection(String direction) {

@@ -26,8 +26,8 @@ public class KalmanFilterLocalizer {
 	public void updateDistance() {
 		double tachoTicks = 0.5*(leftMotor.getTachoCount() + rightMotor.getTachoCount());
 		double tachoDifference = tachoTicks - tachoCount;
-		currentPose[0] += Math.cos(currentPose[2])*tachoDifference/PizzaDeliveryUtils.DIST_TO_DEG;
-		currentPose[1] += Math.sin(currentPose[2])*tachoDifference/PizzaDeliveryUtils.DIST_TO_DEG;
+		currentPose[0] += Math.cos(currentPose[2]/PizzaDeliveryUtils.RAD_TO_DEG)*tachoDifference/PizzaDeliveryUtils.DIST_TO_DEG;
+		currentPose[1] += Math.sin(currentPose[2]/PizzaDeliveryUtils.RAD_TO_DEG)*tachoDifference/PizzaDeliveryUtils.DIST_TO_DEG;
 		tachoCount = tachoTicks;
 	}
 

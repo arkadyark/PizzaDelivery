@@ -2,6 +2,7 @@ import lejos.hardware.motor.NXTRegulatedMotor;
 
 public class PointToPointDriver {
 
+	private static final double EPSILON = 1.0;
 	public Interruptor interruptor;
 	public double x, y, theta;
 	private KalmanFilterLocalizer currentPose;
@@ -33,14 +34,25 @@ public class PointToPointDriver {
 		if(theta > 180) {
 			theta -= 360;
 		}
-	}
-	
+	}	
 	
 	private void turn(double degrees){
 		// Can use gyroscope/Kalman filter reading and put this in a loop to get it more accurate
-		rightMotor.rotate((int)Math.round(degrees), true);
-		leftMotor.rotate((int)Math.round(-degrees));
-		currentPose.updateAngle();
+		double angle = currentPose.getPose()[2];
+		double desired = (angle + degrees) % 360;
+		if (degrees > 0) {			
+			rightMotor.forward();
+			leftMotor.backward();
+		} else {
+			rightMotor.backward();
+			leftMotor.forward();
+		}
+		while (Math.abs(angle - desired) > EPSILON) {
+			currentPose.updateAngle();
+			angle = currentPose.getPose()[2];
+		}
+		leftMotor.stop();
+		rightMotor.stop();
 	}
 	
 	private boolean straight(double degrees){		
@@ -69,13 +81,13 @@ public class PointToPointDriver {
 	}
 
 	public boolean driveUntilStopped() {
-		double rise = Math.atan2(y, x);
+		double rise = Math.atan2(y, x)*PizzaDeliveryUtils.RAD_TO_DEG;
 		turn(rise*PizzaDeliveryUtils.DEG_TO_DEG);
-		boolean interrupted = straight(Math.pow((Math.pow(x,  2) + Math.pow(y, 2)), .5)*PizzaDeliveryUtils.DIST_TO_DEG);
-		if (!interrupted) {
+		boolean finished = straight(Math.pow((Math.pow(x,  2) + Math.pow(y, 2)), .5)*PizzaDeliveryUtils.DIST_TO_DEG);
+		if (finished) {
 			turn((theta-rise)*PizzaDeliveryUtils.DEG_TO_DEG);
 		}
-		return interrupted;
+		return finished;
 	}
 
 }
