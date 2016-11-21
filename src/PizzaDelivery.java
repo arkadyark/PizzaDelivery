@@ -64,7 +64,7 @@ public class PizzaDelivery {
 
 	private void followRoadToHouse() {
 		HouseCounter houseCounter =  new HouseCounter(targetHouse, ultrasonic);
-		LineFollower follower = new LineFollower(houseCounter);
+		LineFollower follower = new LineFollower(leftMotor, rightMotor, color, houseCounter);
 		follower.driveUntilStopped();
 	}
 	
