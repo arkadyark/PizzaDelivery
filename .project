@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>PizzaDelivery2</name>
+	<name>PizzaDelivery</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -18,6 +18,8 @@
 	</buildSpec>
 	<natures>
 		<nature>org.lejos.ev3.ldt.leJOSEV3Nature</nature>
+	</buildSpec>
+	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
 </projectDescription>

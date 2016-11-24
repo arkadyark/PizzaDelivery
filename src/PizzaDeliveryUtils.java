@@ -16,7 +16,11 @@ public class PizzaDeliveryUtils {
 	}
 	
 	static float getAngle(EV3GyroSensor gyro) {
+<<<<<<< HEAD
 		float N = 30;
+=======
+		float N = 10;
+>>>>>>> 4c920af249bf26ac547b3c8e1c2ef75d4d5a488a
 		float estimatedAngle = 0;
 		for (int i = 0; i < N; i++) {			
 			int sampleSize = gyro.sampleSize();
