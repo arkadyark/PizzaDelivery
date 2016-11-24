@@ -2,8 +2,8 @@ import lejos.hardware.Button;
 import lejos.hardware.lcd.LCD;
 
 public class PizzaDeliverySettings {
-	private static final double[] LEFT_PIZZA_COORDS = {6.2, 41.7, 90};
-	private static final double[] RIGHT_PIZZA_COORDS = {6.2, -41.7, -90};
+	private static final double[] LEFT_PIZZA_COORDS = {6.2, 41.7, -90};
+	private static final double[] RIGHT_PIZZA_COORDS = {6.2, -41.7, 90};
 	private static final double[] LEFT_ROAD_START_COORDS = {216.6, 39, 30};
 	private static final double[] CENTER_ROAD_START_COORDS = {216.6, 0, 0};
 	private static final double[] RIGHT_ROAD_START_COORDS = {216.6, -39, -30};
@@ -16,11 +16,7 @@ public class PizzaDeliverySettings {
 	public PizzaDeliverySettings() {
 		while (true) {
 			LCD.clearDisplay();
-<<<<<<< HEAD
 			LCD.drawString("Left or right pizza?", 2, 2);
-=======
-			System.out.println("Left pizza or right pizza?");
->>>>>>> 4c920af249bf26ac547b3c8e1c2ef75d4d5a488a
 			int buttonID = Button.waitForAnyPress();
 			if (buttonID == Button.ID_LEFT) {
 				setPizzaDirection("LEFT");
@@ -34,11 +30,7 @@ public class PizzaDeliverySettings {
 		
 		while (true) {			
 			LCD.clearDisplay();
-<<<<<<< HEAD
 			LCD.drawString("Left, middle or right road?", 2, 2);
-=======
-			System.out.println("Left, middle, or right road?");
->>>>>>> 4c920af249bf26ac547b3c8e1c2ef75d4d5a488a
 			int buttonID = Button.waitForAnyPress();
 			if (buttonID == Button.ID_ENTER) {
 				roadStartCoords = CENTER_ROAD_START_COORDS;
@@ -56,11 +48,7 @@ public class PizzaDeliverySettings {
 		
 		while (true) {			
 			LCD.clearDisplay();
-<<<<<<< HEAD
 			LCD.drawString("Which side is the house on?", 2, 2);
-=======
-			System.out.println("Which side is the house on?");
->>>>>>> 4c920af249bf26ac547b3c8e1c2ef75d4d5a488a
 			int buttonID = Button.waitForAnyPress();
 			if (buttonID == Button.ID_LEFT) {
 				deliverySide = "LEFT";
@@ -75,11 +63,7 @@ public class PizzaDeliverySettings {
 		
 		houseNumber = 0;
 		LCD.clearDisplay();
-<<<<<<< HEAD
 		LCD.drawString("Which house number on that side?", 2, 2);
-=======
-		System.out.println("Which house number on that side?");
->>>>>>> 4c920af249bf26ac547b3c8e1c2ef75d4d5a488a
 		while (true) {			
 			int buttonID = Button.waitForAnyPress();
 			if (buttonID == Button.ID_UP) {

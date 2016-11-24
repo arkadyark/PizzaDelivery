@@ -37,24 +37,49 @@ public class PointToPointDriver {
 	}	
 	
 	private void turn(double degrees){
-		// Can use gyroscope/Kalman filter reading and put this in a loop to get it more accurate
 		double angle = currentPose.getPose()[2];
-		double desired = (angle + degrees) % 360;
-		if (degrees > 0) {			
-			rightMotor.forward();
-			leftMotor.backward();
-		} else {
-			rightMotor.backward();
-			leftMotor.forward();
-		}
-		while (Math.abs(angle - desired) > EPSILON) {
+		double desired = normalizeAngle(angle + degrees);
+		boolean leftFaster = turningLeftFaster(angle, desired);
+		double distance = Math.min(Math.abs(angle - desired), Math.abs((desired + 360) % 360) - ((desired + 360) % 360));
+		
+		while (distance < EPSILON) {
+			if (leftFaster) {
+				leftMotor.backward();
+				rightMotor.forward();
+			} else {
+				leftMotor.forward();
+				rightMotor.backward();
+			}
 			currentPose.updateAngle();
 			angle = currentPose.getPose()[2];
+			leftFaster = turningLeftFaster(angle, desired);
+			distance = Math.min(Math.abs(angle - desired), Math.abs((desired + 360) % 360) - ((desired + 360) % 360));
 		}
 		leftMotor.stop();
 		rightMotor.stop();
 	}
 	
+	private boolean turningLeftFaster(double angle, double desired) {
+		double leftPosition = angle;
+		double rightPosition = angle;
+		for (int i = 0; i < 180; i++) {
+			leftPosition = normalizeAngle(leftPosition + 1);
+			rightPosition = normalizeAngle(rightPosition - 1);
+			if (Math.abs(leftPosition - desired) < 1) {
+				return true;
+			} else if (Math.abs(rightPosition - desired) < 1) {
+				return false;
+			}
+		}
+		
+		// Should never reach here
+		return true;
+	}
+	
+	private double normalizeAngle(double angle) {
+		return ((angle + 180) % 180) - 180;
+	}
+
 	private boolean straight(double degrees){		
 		if(interruptor == null) {
 			rightMotor.rotate((int)Math.round(degrees), true);
@@ -82,10 +107,10 @@ public class PointToPointDriver {
 
 	public boolean driveUntilStopped() {
 		double rise = Math.atan2(y, x)*PizzaDeliveryUtils.RAD_TO_DEG;
-		turn(rise*PizzaDeliveryUtils.DEG_TO_DEG);
+		turn(rise);
 		boolean finished = straight(Math.pow((Math.pow(x,  2) + Math.pow(y, 2)), .5)*PizzaDeliveryUtils.DIST_TO_DEG);
 		if (finished) {
-			turn((theta-rise)*PizzaDeliveryUtils.DEG_TO_DEG);
+			turn(theta-rise);
 		}
 		return finished;
 	}
