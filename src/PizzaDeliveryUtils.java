@@ -1,3 +1,4 @@
+import lejos.hardware.lcd.LCD;
 import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.hardware.sensor.EV3GyroSensor;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
@@ -32,5 +33,17 @@ public class PizzaDeliveryUtils {
 		float[] redsample = new float[sampleSize];
 		color.getRedMode().fetchSample(redsample, 0);
 		return redsample[0];
+	}
+	
+	static void displayStatus(String pose) {
+		LCD.clearDisplay();
+
+		LCD.drawString("Status: " + PizzaDelivery.status, 0, 1);
+		LCD.drawString("Pose: " + pose, 0, 2);
+	}
+	
+	static void displayStatus(String pose, String other) {
+		displayStatus(pose);
+		LCD.drawString("Other: " + other, 0, 3);
 	}
 }

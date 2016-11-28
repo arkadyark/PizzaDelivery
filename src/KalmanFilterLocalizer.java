@@ -38,4 +38,9 @@ public class KalmanFilterLocalizer {
 	public void setPose(double newPose[]) {
 		this.currentPose = newPose;
 	}
+
+	public void update() {
+		updateAngle();
+		updateDistance();
+	}
 }

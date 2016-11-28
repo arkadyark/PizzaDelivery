@@ -29,6 +29,10 @@ public class HouseCounter implements Interruptor {
 	public boolean isFinished() {
 		float distance = PizzaDeliveryUtils.getDistance(ultrasonic);
 		
+		String nextToHouseString = seeingHouse ? "next to a house\n" : "not next to a house\n";
+		String houseCountString = "Seen houses " + Integer.toString(houseCount) + "/" + Integer.toString(targetHouse);
+		PizzaDeliveryUtils.displayStatus("N/A", nextToHouseString + houseCountString);
+		
 		if (seeingHouse) {
 			if (distance > HOUSE_THRESHOLD) {
 				// We've moved past the house, allow ourselves to detect more houses

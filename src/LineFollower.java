@@ -9,13 +9,17 @@ public class LineFollower {
 
 	private NXTRegulatedMotor leftMotor;
 	private NXTRegulatedMotor rightMotor;
+	private KalmanFilterLocalizer currentPose;
 	private EV3ColorSensor color;
 	private Interruptor interruptor;
 	
 	private static float desired = 0.12f;
 	private static float kP = 300;
 
-	public LineFollower(NXTRegulatedMotor rightMotor, NXTRegulatedMotor leftMotor, EV3ColorSensor color, Interruptor interruptor) {
+	public LineFollower(KalmanFilterLocalizer currentPose, 
+			NXTRegulatedMotor rightMotor, NXTRegulatedMotor leftMotor, 
+			EV3ColorSensor color, Interruptor interruptor) {
+		this.currentPose = currentPose;
 		this.leftMotor = leftMotor;
 		this.rightMotor = rightMotor;
 		this.color = color;
@@ -32,6 +36,8 @@ public class LineFollower {
 			leftMotor.forward();
 			rightMotor.setSpeed(Math.round(PizzaDeliveryUtils.SPEED - correction/2.0));
 			rightMotor.forward();
+			
+			currentPose.update();
 		}
 		leftMotor.stop();
 		rightMotor.stop();

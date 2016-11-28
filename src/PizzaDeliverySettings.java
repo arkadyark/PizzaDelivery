@@ -16,7 +16,7 @@ public class PizzaDeliverySettings {
 	public PizzaDeliverySettings() {
 		while (true) {
 			LCD.clearDisplay();
-			LCD.drawString("Left or right pizza?", 2, 2);
+			LCD.drawString("Left or right pizza?", 1, 2);
 			int buttonID = Button.waitForAnyPress();
 			if (buttonID == Button.ID_LEFT) {
 				setPizzaDirection("LEFT");
@@ -30,7 +30,7 @@ public class PizzaDeliverySettings {
 		
 		while (true) {			
 			LCD.clearDisplay();
-			LCD.drawString("Left, middle or right road?", 2, 2);
+			LCD.drawString("Left, middle or right road?", 1, 2);
 			int buttonID = Button.waitForAnyPress();
 			if (buttonID == Button.ID_ENTER) {
 				roadStartCoords = CENTER_ROAD_START_COORDS;
@@ -48,7 +48,7 @@ public class PizzaDeliverySettings {
 		
 		while (true) {			
 			LCD.clearDisplay();
-			LCD.drawString("Which side is the house on?", 2, 2);
+			LCD.drawString("Which side is the house on?", 1, 2);
 			int buttonID = Button.waitForAnyPress();
 			if (buttonID == Button.ID_LEFT) {
 				deliverySide = "LEFT";
@@ -63,7 +63,7 @@ public class PizzaDeliverySettings {
 		
 		houseNumber = 0;
 		LCD.clearDisplay();
-		LCD.drawString("Which house number on that side?", 2, 2);
+		LCD.drawString("Which house number on that side?", 1, 2);
 		while (true) {			
 			int buttonID = Button.waitForAnyPress();
 			if (buttonID == Button.ID_UP) {

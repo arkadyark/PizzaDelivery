@@ -1,10 +1,8 @@
 import lejos.hardware.motor.NXTRegulatedMotor;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
 
-public class ObstacleAvoider {
-	private static final double EPSILON = 1;
-	private static final float CLEARANCE_THRESHOLD = 0;
-	private KalmanFilterLocalizer currentPose;
+public class ObstacleAvoider extends Driver {
+	private static final float CLEARANCE_THRESHOLD = 20;
 	private NXTRegulatedMotor leftMotor;
 	private NXTRegulatedMotor rightMotor;
 	private EV3UltrasonicSensor ultrasonic;
@@ -12,31 +10,9 @@ public class ObstacleAvoider {
 
 	public ObstacleAvoider(KalmanFilterLocalizer currentPose, NXTRegulatedMotor leftMotor, NXTRegulatedMotor rightMotor,
 			EV3UltrasonicSensor ultrasonic, NXTRegulatedMotor ultrasonicMotor) {
-		this.currentPose = currentPose;
-		this.leftMotor = leftMotor;
-		this.rightMotor = rightMotor;
+		super(currentPose, leftMotor, rightMotor);
 		this.ultrasonic = ultrasonic;
 		this.ultrasonicMotor = ultrasonicMotor;
-	}
-	
-	// TODO: Refactor to not copy this in PointToPoint and here
-	private void turn(double degrees){
-		// Can use gyroscope/Kalman filter reading and put this in a loop to get it more accurate
-		double angle = currentPose.getPose()[2];
-		double desired = (angle + degrees) % 360;
-		if (degrees > 0) {			
-			rightMotor.forward();
-			leftMotor.backward();
-		} else {
-			rightMotor.backward();
-			leftMotor.forward();
-		}
-		while (Math.abs(angle - desired) > EPSILON) {
-			currentPose.updateAngle();
-			angle = currentPose.getPose()[2];
-		}
-		leftMotor.stop();
-		rightMotor.stop();
 	}
 	
 	public void drivePastObstacle() {
