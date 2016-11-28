@@ -1,4 +1,5 @@
 /HouseCounter.class
+/Icon
 /Interruptor.class
 /KalmanFilterLocalizer.class
 /LineFollower.class
@@ -6,4 +7,5 @@
 /ObstacleDetector.class
 /PizzaDelivery.class
 /PizzaDeliverySettings.class
+/PizzaDeliveryUtils.class
 /PointToPointDriver.class

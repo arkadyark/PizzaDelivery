@@ -39,6 +39,7 @@ public class PizzaDelivery {
 
 	private void initialize() {
 		armMotor.rotateTo(0);
+		
 		gyro.reset();
 		Delay.msDelay(1000);
 	}
@@ -49,9 +50,11 @@ public class PizzaDelivery {
 	}
 
 	private void pickUpPizza() {
+		leftMotor.rotate((int) Math.round(-3/PizzaDeliveryUtils.DIST_TO_DEG), true);
+		rightMotor.rotate((int) Math.round(-3/PizzaDeliveryUtils.DIST_TO_DEG));
 		armMotor.rotateTo(180);
-		leftMotor.rotate((int) Math.round(-15/PizzaDeliveryUtils.DIST_TO_DEG), true);
-		rightMotor.rotate((int) Math.round(-15/PizzaDeliveryUtils.DIST_TO_DEG));
+		leftMotor.rotate((int) Math.round(5/PizzaDeliveryUtils.DIST_TO_DEG), true);
+		rightMotor.rotate((int) Math.round(5/PizzaDeliveryUtils.DIST_TO_DEG));
 		currentPose.updateAngle();
 		currentPose.updateDistance();
 	}

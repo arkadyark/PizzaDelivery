@@ -18,8 +18,6 @@
 	</buildSpec>
 	<natures>
 		<nature>org.lejos.ev3.ldt.leJOSEV3Nature</nature>
-	</buildSpec>
-	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
 </projectDescription>
