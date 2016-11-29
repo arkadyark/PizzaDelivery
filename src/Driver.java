@@ -1,5 +1,3 @@
-import java.util.Arrays;
-
 import lejos.hardware.motor.NXTRegulatedMotor;
 
 public class Driver {
@@ -22,7 +20,7 @@ public class Driver {
 		leftMotor.setSpeed(PizzaDeliveryUtils.TURNING_SPEED);
 		rightMotor.setSpeed(PizzaDeliveryUtils.TURNING_SPEED);
 		while (distance > EPSILON) {
-			PizzaDeliveryUtils.displayStatus(Arrays.toString(currentPose.getPose()), 
+			PizzaDeliveryUtils.displayStatus(currentPose, 
 					Double.toString(distance) + " from " + Double.toString(desired));
 			if (leftFaster) {
 				leftMotor.backward();
@@ -38,8 +36,10 @@ public class Driver {
 			double distance2 = Math.abs(((angle + 360) % 360) - ((desired + 360) % 360));
 			distance = Math.min(distance1, distance2);
 		}
+		currentPose.update();
 		leftMotor.stop();
 		rightMotor.stop();
+		currentPose.updateAngle();
 		leftMotor.setSpeed(PizzaDeliveryUtils.SPEED);
 		rightMotor.setSpeed(PizzaDeliveryUtils.SPEED);
 	}

@@ -36,14 +36,17 @@ public class PizzaDeliveryUtils {
 		return redsample[0];
 	}
 	
-	static void displayStatus(String pose) {
+	static void displayStatus(KalmanFilterLocalizer currentPose) {
 		LCD.clearDisplay();
 
 		LCD.drawString(PizzaDelivery.status, 0, 0);
-		LCD.drawString(pose, 0, 1);
+		String poseString = "[" + Math.round(currentPose.getPose()[0]) + " " +
+				Math.round(currentPose.getPose()[1]) + " " +
+				Math.round(currentPose.getPose()[2]) + "]";
+		LCD.drawString(poseString, 0, 1);
 	}
 	
-	static void displayStatus(String pose, String other) {
+	static void displayStatus(KalmanFilterLocalizer pose, String other) {
 		displayStatus(pose);
 		LCD.drawString(other, 0, 2);
 	}

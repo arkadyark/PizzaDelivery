@@ -2,7 +2,7 @@ import lejos.hardware.motor.NXTRegulatedMotor;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
 
 public class HouseCounter implements Interruptor {
-	private static final float HOUSE_THRESHOLD = 0.3f;
+	private static final float HOUSE_THRESHOLD = 0.35f;
 	
 	private int targetHouse;
 	private int houseCount = 0;
@@ -29,10 +29,6 @@ public class HouseCounter implements Interruptor {
 	public boolean isFinished() {
 		float distance = PizzaDeliveryUtils.getDistance(ultrasonic);
 		
-		String nextToHouseString = seeingHouse ? "next to a house\n" : "not next to a house\n";
-		String houseCountString = "Seen houses " + Integer.toString(houseCount) + "/" + Integer.toString(targetHouse);
-		PizzaDeliveryUtils.displayStatus("N/A", nextToHouseString + houseCountString);
-		
 		if (seeingHouse) {
 			if (distance > HOUSE_THRESHOLD) {
 				// We've moved past the house, allow ourselves to detect more houses
@@ -44,8 +40,8 @@ public class HouseCounter implements Interruptor {
 			houseCount++;
 		}
 		
-		if (houseCount == targetHouse) {
-			ultrasonicMotor.rotateTo(90);
+		if (houseCount == targetHouse + 1) { // + 1 because of the indicator pile
+			ultrasonicMotor.rotateTo(0);
 			return true;
 		} else {
 			return false;

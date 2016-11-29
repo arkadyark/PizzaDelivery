@@ -1,5 +1,3 @@
-import java.util.Arrays;
-
 import lejos.hardware.motor.Motor;
 import lejos.hardware.motor.NXTRegulatedMotor;
 import lejos.hardware.port.SensorPort;
@@ -42,13 +40,13 @@ public class PizzaDelivery {
 		
 		currentPose = new KalmanFilterLocalizer(START, leftMotor, rightMotor, gyro);
 		
-		PizzaDeliveryUtils.displayStatus(Arrays.toString(currentPose.getPose()),
+		PizzaDeliveryUtils.displayStatus(currentPose,
 				"house " + Integer.toString(targetHouse) + " on the " + deliverySide.toLowerCase());
 	}
 	
 	private void initialize() {
 		status = "INITIALIZING";
-		PizzaDeliveryUtils.displayStatus(Arrays.toString(currentPose.getPose()));
+		PizzaDeliveryUtils.displayStatus(currentPose);
 		
 		armMotor.rotateTo(0);
 		ultrasonicMotor.rotateTo(0);
@@ -56,14 +54,14 @@ public class PizzaDelivery {
 		leftMotor.setSpeed(PizzaDeliveryUtils.SPEED);
 		rightMotor.setSpeed(PizzaDeliveryUtils.SPEED);
 		
-		PizzaDeliveryUtils.displayStatus(Arrays.toString(currentPose.getPose()), "resetting gyroscope");
+		PizzaDeliveryUtils.displayStatus(currentPose, "resetting gyroscope");
 		gyro.reset();
 		Delay.msDelay(1000);
 	}
 	
 	private void driveToPizza() {
 		status = "DRIVING TO PIZZA";
-		PizzaDeliveryUtils.displayStatus(Arrays.toString(currentPose.getPose()), "pizza at " + pizzaCoords.toString());
+		PizzaDeliveryUtils.displayStatus(currentPose);
 		
 		PointToPointDriver driver = new PointToPointDriver(currentPose, pizzaCoords, leftMotor, rightMotor);
 		driver.driveUntilStopped();
@@ -73,12 +71,13 @@ public class PizzaDelivery {
 	private void pickUpPizza() {
 		status = "PICKING UP PIZZA";
 		
-		PizzaDeliveryUtils.displayStatus(Arrays.toString(currentPose.getPose()), "backing in");
+		PizzaDeliveryUtils.displayStatus(currentPose, "backing in");
 		leftMotor.rotate((int) Math.round(-10*PizzaDeliveryUtils.DIST_TO_DEG), true);
 		rightMotor.rotate((int) Math.round(-10*PizzaDeliveryUtils.DIST_TO_DEG));
-		PizzaDeliveryUtils.displayStatus(Arrays.toString(currentPose.getPose()), "grabbing");
+		currentPose.update();
+		PizzaDeliveryUtils.displayStatus(currentPose, "grabbing");
 		armMotor.rotateTo(180);
-		PizzaDeliveryUtils.displayStatus(Arrays.toString(currentPose.getPose()), "driving out");
+		PizzaDeliveryUtils.displayStatus(currentPose, "driving out");
 		leftMotor.rotate((int) Math.round(10*PizzaDeliveryUtils.DIST_TO_DEG), true);
 		rightMotor.rotate((int) Math.round(10*PizzaDeliveryUtils.DIST_TO_DEG));
 		currentPose.update();
@@ -86,18 +85,18 @@ public class PizzaDelivery {
 
 	private void driveToRoad() {
 		status = "DRIVING TO ROAD";
-		PizzaDeliveryUtils.displayStatus(Arrays.toString(currentPose.getPose()));
+		PizzaDeliveryUtils.displayStatus(currentPose);
 		
 		boolean gotToTarget = false;
 		while (!gotToTarget) {
 			ObstacleDetector obstacleDetector = new ObstacleDetector(ultrasonic);
 			PointToPointDriver driver = new PointToPointDriver(currentPose, roadCoords, leftMotor, rightMotor, obstacleDetector);
-			PizzaDeliveryUtils.displayStatus(Arrays.toString(currentPose.getPose()), "driving along");
+			PizzaDeliveryUtils.displayStatus(currentPose, "driving along");
 			gotToTarget = driver.driveUntilStopped();
 			currentPose = driver.getCurrentPose();
 			if (gotToTarget) return;
 			ObstacleAvoider obstacleAvoider = new ObstacleAvoider(currentPose, leftMotor, rightMotor, ultrasonic, ultrasonicMotor);
-			PizzaDeliveryUtils.displayStatus(Arrays.toString(currentPose.getPose()), "avoiding an obstacle");
+			PizzaDeliveryUtils.displayStatus(currentPose, "avoiding an obstacle");
 			obstacleAvoider.drivePastObstacle();
 			currentPose = obstacleAvoider.getCurrentPose();
 		}
@@ -105,7 +104,7 @@ public class PizzaDelivery {
 
 	private void followRoadToHouse() {
 		status = "FOLLOWING ROAD TO HOUSE";
-		PizzaDeliveryUtils.displayStatus(Arrays.toString(currentPose.getPose()));
+		PizzaDeliveryUtils.displayStatus(currentPose);
 		
 		HouseCounter houseCounter =  new HouseCounter(targetHouse, deliverySide, ultrasonic, ultrasonicMotor);
 		LineFollower follower = new LineFollower(currentPose, leftMotor, rightMotor, color, houseCounter);
@@ -115,43 +114,40 @@ public class PizzaDelivery {
 	
 	private void turnToFaceHouse() {
 		status = "TURNING TO HOUSE";
-		PizzaDeliveryUtils.displayStatus(Arrays.toString(currentPose.getPose()), "house on the " + deliverySide.toLowerCase());
+		PizzaDeliveryUtils.displayStatus(currentPose, "house on the " + deliverySide.toLowerCase());
 		
-		double desiredPose[] = currentPose.getPose();
-		PointToPointDriver driver = null;
+		Driver driver = null;
 		if (deliverySide == "LEFT") {
-			desiredPose[2] -= 90;
-			driver = new PointToPointDriver(currentPose, desiredPose, leftMotor, rightMotor);
-			driver.driveUntilStopped();
+			driver = new Driver(currentPose, leftMotor, rightMotor);
+			driver.turn(-90);
 		} else if (deliverySide == "RIGHT") {
-			desiredPose[2] += 90;
-			driver = new PointToPointDriver(currentPose, desiredPose, leftMotor, rightMotor);
-			driver.driveUntilStopped();
+			driver = new Driver(currentPose, leftMotor, rightMotor);
+			driver.turn(90);
 		}
-		currentPose = driver.getCurrentPose();
+		currentPose.updateAngle();
 	}
 	
 	private void dropOffPizza() {
 		status = "DROPPING OFF PIZZA";
-		PizzaDeliveryUtils.displayStatus(Arrays.toString(currentPose.getPose()));
+		PizzaDeliveryUtils.displayStatus(currentPose);
 		
 		armMotor.rotateTo(0);
 	}
 
 	private void driveToStart() {
 		status = "RETURNING TO START";
-		PizzaDeliveryUtils.displayStatus(Arrays.toString(currentPose.getPose()));
+		PizzaDeliveryUtils.displayStatus(currentPose);
 		
 		boolean gotToTarget = false;
 		while (!gotToTarget) {
 			ObstacleDetector obstacleDetector = new ObstacleDetector(ultrasonic);
 			PointToPointDriver driver = new PointToPointDriver(currentPose, START, leftMotor, rightMotor, obstacleDetector);
-			PizzaDeliveryUtils.displayStatus(Arrays.toString(currentPose.getPose()), "driving along");
+			PizzaDeliveryUtils.displayStatus(currentPose, "driving along");
 			gotToTarget = driver.driveUntilStopped();
 			currentPose = driver.getCurrentPose();
 			if (gotToTarget) return;
 			ObstacleAvoider obstacleAvoider = new ObstacleAvoider(currentPose, leftMotor, rightMotor, ultrasonic, ultrasonicMotor);
-			PizzaDeliveryUtils.displayStatus(Arrays.toString(currentPose.getPose()), "avoiding an obstacle");
+			PizzaDeliveryUtils.displayStatus(currentPose, "avoiding an obstacle");
 			obstacleAvoider.drivePastObstacle();
 			currentPose = obstacleAvoider.getCurrentPose();
 		}

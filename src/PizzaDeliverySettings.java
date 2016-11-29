@@ -64,6 +64,9 @@ public class PizzaDeliverySettings {
 		houseNumber = 0;
 		LCD.clearDisplay();
 		LCD.drawString("House number?", 0, 0);
+		incrementHouseNumber();
+		LCD.clear(1);
+		LCD.drawInt(houseNumber, 0, 1);
 		while (true) {		
 			int buttonID = Button.waitForAnyPress();
 			if (buttonID == Button.ID_UP) {
@@ -99,11 +102,11 @@ public class PizzaDeliverySettings {
 	}
 	
 	public void incrementHouseNumber() {
-		houseNumber++;
+		houseNumber = Math.min(houseNumber + 1, 5);
 	}
 	
 	private void decrementHouseNumber() {
-		houseNumber = Math.max(houseNumber - 1, 0);
+		houseNumber = Math.max(houseNumber - 1, 1);
 	}
 
 	public int getHouseNumber() {

@@ -14,7 +14,7 @@ public class LineFollower {
 	private Interruptor interruptor;
 	
 	private static float desired = 0.12f;
-	private static float kP = 300;
+	private static float kP = 1500;
 
 	public LineFollower(KalmanFilterLocalizer currentPose, 
 			NXTRegulatedMotor rightMotor, NXTRegulatedMotor leftMotor, 
