@@ -8,6 +8,7 @@ public class PizzaDeliveryUtils {
 	public static double DEG_TO_DEG = (9+14.5)/(2*5.5);
 	public static double DIST_TO_DEG = 360/(Math.PI*5.5);
 	public static int SPEED = 200;
+	public static final int TURNING_SPEED = 50;
 	
 	static float getDistance(EV3UltrasonicSensor ultrasonic) {
 		int sampleSize = ultrasonic.sampleSize();
@@ -38,12 +39,12 @@ public class PizzaDeliveryUtils {
 	static void displayStatus(String pose) {
 		LCD.clearDisplay();
 
-		LCD.drawString("Status: " + PizzaDelivery.status, 0, 1);
-		LCD.drawString("Pose: " + pose, 0, 2);
+		LCD.drawString(PizzaDelivery.status, 0, 0);
+		LCD.drawString(pose, 0, 1);
 	}
 	
 	static void displayStatus(String pose, String other) {
 		displayStatus(pose);
-		LCD.drawString("Other: " + other, 0, 3);
+		LCD.drawString(other, 0, 2);
 	}
 }

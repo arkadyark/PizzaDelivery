@@ -2,9 +2,7 @@ import lejos.hardware.motor.NXTRegulatedMotor;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
 
 public class ObstacleAvoider extends Driver {
-	private static final float CLEARANCE_THRESHOLD = 20;
-	private NXTRegulatedMotor leftMotor;
-	private NXTRegulatedMotor rightMotor;
+	private static final float CLEARANCE_THRESHOLD = 0.50f;
 	private EV3UltrasonicSensor ultrasonic;
 	private NXTRegulatedMotor ultrasonicMotor;
 
@@ -23,19 +21,21 @@ public class ObstacleAvoider extends Driver {
 		ultrasonicMotor.rotateTo(0);
 		if (leftDistance > rightDistance) {
 			turn(90);
-			ultrasonicMotor.rotateTo(-90);
+			ultrasonicMotor.rotateTo(90);
 		} else {
 			turn(-90);
-			ultrasonicMotor.rotateTo(90);
+			ultrasonicMotor.rotateTo(-90);
 		}
+		currentPose.updateAngle();
 		float distance = PizzaDeliveryUtils.getDistance(ultrasonic);
 		leftMotor.forward();
 		rightMotor.forward();
 		while (distance < CLEARANCE_THRESHOLD) {
 			distance = PizzaDeliveryUtils.getDistance(ultrasonic);
 		}
-		leftMotor.stop();
 		rightMotor.stop();
+		leftMotor.stop();
 		ultrasonicMotor.rotateTo(0);
+		currentPose.update();
 	}
 }

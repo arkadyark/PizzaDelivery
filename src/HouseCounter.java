@@ -19,9 +19,9 @@ public class HouseCounter implements Interruptor {
 		this.seeingHouse = false;
 		
 		if (deliverySide == "LEFT") {
-			ultrasonicMotor.rotateTo(90);
-		} else if (deliverySide == "RIGHT") {
 			ultrasonicMotor.rotateTo(-90);
+		} else if (deliverySide == "RIGHT") {
+			ultrasonicMotor.rotateTo(90);
 		}
 	}
 	

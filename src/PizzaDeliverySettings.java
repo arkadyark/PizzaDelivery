@@ -2,11 +2,11 @@ import lejos.hardware.Button;
 import lejos.hardware.lcd.LCD;
 
 public class PizzaDeliverySettings {
-	private static final double[] LEFT_PIZZA_COORDS = {6.2, 40, -90};
-	private static final double[] RIGHT_PIZZA_COORDS = {6.2, -40, 90};
-	private static final double[] LEFT_ROAD_START_COORDS = {216.6, 39, 30};
-	private static final double[] CENTER_ROAD_START_COORDS = {216.6, 0, 0};
-	private static final double[] RIGHT_ROAD_START_COORDS = {216.6, -39, -30};
+	private static final double[] LEFT_PIZZA_COORDS = {15.1, 36.5, -90};
+	private static final double[] RIGHT_PIZZA_COORDS = {15.1, -36.5, 90};
+	private static final double[] LEFT_ROAD_START_COORDS = {219, 39, 30};
+	private static final double[] CENTER_ROAD_START_COORDS = {216, 0, 0};
+	private static final double[] RIGHT_ROAD_START_COORDS = {219, -39, -30};
 
 	private int houseNumber;
 	private double[] pizzaCoords;
@@ -16,7 +16,7 @@ public class PizzaDeliverySettings {
 	public PizzaDeliverySettings() {
 		while (true) {
 			LCD.clearDisplay();
-			LCD.drawString("Left or right pizza?", 1, 2);
+			LCD.drawString("L/R pizza?", 0, 0);
 			int buttonID = Button.waitForAnyPress();
 			if (buttonID == Button.ID_LEFT) {
 				setPizzaDirection("LEFT");
@@ -30,7 +30,7 @@ public class PizzaDeliverySettings {
 		
 		while (true) {			
 			LCD.clearDisplay();
-			LCD.drawString("Left, middle or right road?", 1, 2);
+			LCD.drawString("L/M/R road?", 0, 0);
 			int buttonID = Button.waitForAnyPress();
 			if (buttonID == Button.ID_ENTER) {
 				roadStartCoords = CENTER_ROAD_START_COORDS;
@@ -48,7 +48,7 @@ public class PizzaDeliverySettings {
 		
 		while (true) {			
 			LCD.clearDisplay();
-			LCD.drawString("Which side is the house on?", 1, 2);
+			LCD.drawString("L/R house?", 0, 0);
 			int buttonID = Button.waitForAnyPress();
 			if (buttonID == Button.ID_LEFT) {
 				deliverySide = "LEFT";
@@ -63,16 +63,18 @@ public class PizzaDeliverySettings {
 		
 		houseNumber = 0;
 		LCD.clearDisplay();
-		LCD.drawString("Which house number on that side?", 1, 2);
-		while (true) {			
+		LCD.drawString("House number?", 0, 0);
+		while (true) {		
 			int buttonID = Button.waitForAnyPress();
 			if (buttonID == Button.ID_UP) {
 				incrementHouseNumber();
-				System.out.println(houseNumber);
+				LCD.clear(1);
+				LCD.drawInt(houseNumber, 0, 1);
 			}
 			if (buttonID == Button.ID_DOWN) {
 				decrementHouseNumber();
-				System.out.println(houseNumber);
+				LCD.clear(1);
+				LCD.drawInt(houseNumber, 0, 1);
 			}
 			if (buttonID == Button.ID_ENTER) {
 				break;
@@ -101,7 +103,7 @@ public class PizzaDeliverySettings {
 	}
 	
 	private void decrementHouseNumber() {
-		houseNumber--;
+		houseNumber = Math.max(houseNumber - 1, 0);
 	}
 
 	public int getHouseNumber() {

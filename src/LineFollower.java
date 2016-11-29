@@ -41,5 +41,10 @@ public class LineFollower {
 		}
 		leftMotor.stop();
 		rightMotor.stop();
+		currentPose.update();
+	}
+
+	public KalmanFilterLocalizer getCurrentPose() {
+		return currentPose;
 	}
 }

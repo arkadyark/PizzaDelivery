@@ -1,28 +1,29 @@
+import java.util.Arrays;
+
 import lejos.hardware.motor.NXTRegulatedMotor;
 
 public class Driver {
 	private static final double EPSILON = 1.0;
-	private KalmanFilterLocalizer currentPose;
-	private NXTRegulatedMotor leftMotor;
-	private NXTRegulatedMotor rightMotor;
+	protected KalmanFilterLocalizer currentPose;
+	protected NXTRegulatedMotor leftMotor;
+	protected NXTRegulatedMotor rightMotor;
 	
 	public Driver(KalmanFilterLocalizer currentPose, 
 			NXTRegulatedMotor leftMotor, NXTRegulatedMotor rightMotor) {
 		this.currentPose = currentPose;
 		this.leftMotor = leftMotor;
 		this.rightMotor = rightMotor;
-		leftMotor.setSpeed(PizzaDeliveryUtils.SPEED);
-		rightMotor.setSpeed(PizzaDeliveryUtils.SPEED);
 	}
 	
-
-	protected void turn(double degrees){
-		double angle = currentPose.getPose()[2];
-		double desired = normalizeAngle(angle + degrees);
+	protected void turnTo(double desired) {
+		double angle = normalizeAngle(currentPose.getPose()[2]);
 		boolean leftFaster = turningLeftFaster(angle, desired);
-		double distance = Math.min(Math.abs(angle - desired), Math.abs((desired + 360) % 360) - ((desired + 360) % 360));
-		
-		while (distance < EPSILON) {
+		double distance = 360;
+		leftMotor.setSpeed(PizzaDeliveryUtils.TURNING_SPEED);
+		rightMotor.setSpeed(PizzaDeliveryUtils.TURNING_SPEED);
+		while (distance > EPSILON) {
+			PizzaDeliveryUtils.displayStatus(Arrays.toString(currentPose.getPose()), 
+					Double.toString(distance) + " from " + Double.toString(desired));
 			if (leftFaster) {
 				leftMotor.backward();
 				rightMotor.forward();
@@ -31,16 +32,30 @@ public class Driver {
 				rightMotor.backward();
 			}
 			currentPose.updateAngle();
-			angle = currentPose.getPose()[2];
+			angle = normalizeAngle(currentPose.getPose()[2]);
 			leftFaster = turningLeftFaster(angle, desired);
-			distance = Math.min(Math.abs(angle - desired), Math.abs((desired + 360) % 360) - ((desired + 360) % 360));
+			double distance1 = Math.abs(angle - desired);
+			double distance2 = Math.abs(((angle + 360) % 360) - ((desired + 360) % 360));
+			distance = Math.min(distance1, distance2);
 		}
 		leftMotor.stop();
 		rightMotor.stop();
+		leftMotor.setSpeed(PizzaDeliveryUtils.SPEED);
+		rightMotor.setSpeed(PizzaDeliveryUtils.SPEED);
+	}
+
+	protected void turn(double degrees){
+		double angle = normalizeAngle(currentPose.getPose()[2]);
+		double desired = normalizeAngle(angle + degrees);
+		turnTo(desired);
 	}
 	
 	protected double normalizeAngle(double angle) {
-		return ((angle + 180) % 180) - 180;
+		angle %= 360;
+		if (angle > 180) {
+			angle -= 360;
+		}
+		return angle;
 	}
 	
 	private boolean turningLeftFaster(double angle, double desired) {
@@ -58,5 +73,9 @@ public class Driver {
 		
 		// Should never reach here
 		return true;
+	}
+	
+	public KalmanFilterLocalizer getCurrentPose() {
+		return currentPose;
 	}
 }
