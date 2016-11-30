@@ -1,12 +1,1 @@
-/HouseCounter.class
-/Icon
-/Interruptor.class
-/KalmanFilterLocalizer.class
-/LineFollower.class
-/ObstacleAvoider.class
-/ObstacleDetector.class
-/PizzaDelivery.class
-/PizzaDeliverySettings.class
-/PizzaDeliveryUtils.class
-/PointToPointDriver.class
-/Driver.class
+/Localizer.class

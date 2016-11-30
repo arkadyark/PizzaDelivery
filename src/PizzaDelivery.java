@@ -6,6 +6,12 @@ import lejos.hardware.sensor.EV3GyroSensor;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
 import lejos.utility.Delay;
 
+/***
+ * 
+ * Base class for PizzaDelivery, from which all others are initiated
+ *
+ */
+
 public class PizzaDelivery {
 	private static final double START[] = {0, 0, 0};
 
@@ -25,7 +31,7 @@ public class PizzaDelivery {
 	private double roadCoords[];
 	private double pizzaCoords[];
 	private String deliverySide;
-	private KalmanFilterLocalizer currentPose;
+	private Localizer currentPose;
 	
 	// For logging purposes
 	public static String status;
@@ -38,7 +44,7 @@ public class PizzaDelivery {
 		deliverySide = settings.getDeliverySide();
 		pizzaCoords = settings.getPizzaCoords();
 		
-		currentPose = new KalmanFilterLocalizer(START, leftMotor, rightMotor, gyro);
+		currentPose = new Localizer(START, leftMotor, rightMotor, gyro);
 		
 		PizzaDeliveryUtils.displayStatus(currentPose,
 				"house " + Integer.toString(targetHouse) + " on the " + deliverySide.toLowerCase());
@@ -47,9 +53,6 @@ public class PizzaDelivery {
 	private void initialize() {
 		status = "INITIALIZING";
 		PizzaDeliveryUtils.displayStatus(currentPose);
-		
-		armMotor.rotateTo(0);
-		ultrasonicMotor.rotateTo(0);
 		
 		leftMotor.setSpeed(PizzaDeliveryUtils.SPEED);
 		rightMotor.setSpeed(PizzaDeliveryUtils.SPEED);
@@ -165,8 +168,8 @@ public class PizzaDelivery {
 	}
 
 	public static void main(String[] args) {
-		//PizzaDeliverySettings settings = new PizzaDeliverySettings();
-		PizzaDeliverySettings settings = new PizzaDeliverySettings(true);
+		PizzaDeliverySettings settings = new PizzaDeliverySettings();
+		//PizzaDeliverySettings settings = new PizzaDeliverySettings(true);
 		PizzaDelivery delivery = new PizzaDelivery(settings);
 		delivery.deliver();
 	}

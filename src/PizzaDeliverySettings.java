@@ -1,6 +1,12 @@
 import lejos.hardware.Button;
 import lejos.hardware.lcd.LCD;
 
+/***
+ * 
+ * Class used to input parameters of pizza delivery through the keypad
+ *
+ */
+
 public class PizzaDeliverySettings {
 	private static final double[] LEFT_PIZZA_COORDS = {15.1, 36.5, -90};
 	private static final double[] RIGHT_PIZZA_COORDS = {15.1, -36.5, 90};
@@ -65,7 +71,6 @@ public class PizzaDeliverySettings {
 		LCD.clearDisplay();
 		LCD.drawString("House number?", 0, 0);
 		incrementHouseNumber();
-		LCD.clear(1);
 		LCD.drawInt(houseNumber, 0, 1);
 		while (true) {		
 			int buttonID = Button.waitForAnyPress();
@@ -89,8 +94,7 @@ public class PizzaDeliverySettings {
 		setPizzaDirection("LEFT");
 		roadStartCoords = LEFT_ROAD_START_COORDS;
 		deliverySide = "LEFT";
-		incrementHouseNumber();
-		incrementHouseNumber();
+		houseNumber = 2;
 	}
 	
 	public void setPizzaDirection(String direction) {

@@ -1,12 +1,18 @@
 import lejos.hardware.motor.NXTRegulatedMotor;
 
+/***
+ * 
+ * Base class for driving, subclassed by PointToPointDriver and ObstacleAvoider
+ * Provides turning functionality.
+ */
+
 public class Driver {
 	private static final double EPSILON = 1.0;
-	protected KalmanFilterLocalizer currentPose;
+	protected Localizer currentPose;
 	protected NXTRegulatedMotor leftMotor;
 	protected NXTRegulatedMotor rightMotor;
 	
-	public Driver(KalmanFilterLocalizer currentPose, 
+	public Driver(Localizer currentPose, 
 			NXTRegulatedMotor leftMotor, NXTRegulatedMotor rightMotor) {
 		this.currentPose = currentPose;
 		this.leftMotor = leftMotor;
@@ -14,11 +20,16 @@ public class Driver {
 	}
 	
 	protected void turnTo(double desired) {
-		double angle = normalizeAngle(currentPose.getPose()[2]);
-		boolean leftFaster = turningLeftFaster(angle, desired);
+		/**
+		 * Given a desired angle, turn to that angle
+		 */
+		double currentAngle = normalizeAngle(currentPose.getAngle());
+		boolean leftFaster = turningLeftFaster(currentAngle, desired);
 		double distance = 360;
+		
 		leftMotor.setSpeed(PizzaDeliveryUtils.TURNING_SPEED);
 		rightMotor.setSpeed(PizzaDeliveryUtils.TURNING_SPEED);
+		
 		while (distance > EPSILON) {
 			PizzaDeliveryUtils.displayStatus(currentPose, 
 					Double.toString(distance) + " from " + Double.toString(desired));
@@ -30,13 +41,14 @@ public class Driver {
 				rightMotor.backward();
 			}
 			currentPose.updateAngle();
-			angle = normalizeAngle(currentPose.getPose()[2]);
-			leftFaster = turningLeftFaster(angle, desired);
-			double distance1 = Math.abs(angle - desired);
-			double distance2 = Math.abs(((angle + 360) % 360) - ((desired + 360) % 360));
+			currentAngle = normalizeAngle(currentPose.getAngle());
+			leftFaster = turningLeftFaster(currentAngle, desired);
+			
+			double distance1 = Math.abs(currentAngle - desired);
+			double distance2 = 360 - distance1;
 			distance = Math.min(distance1, distance2);
 		}
-		currentPose.update();
+		currentPose.updateAngle();
 		leftMotor.stop();
 		rightMotor.stop();
 		currentPose.updateAngle();
@@ -45,12 +57,18 @@ public class Driver {
 	}
 
 	protected void turn(double degrees){
-		double angle = normalizeAngle(currentPose.getPose()[2]);
+		/**
+		 * Turn the robot by degrees
+		 */
+		double angle = normalizeAngle(currentPose.getAngle());
 		double desired = normalizeAngle(angle + degrees);
 		turnTo(desired);
 	}
 	
 	protected double normalizeAngle(double angle) {
+		/**
+		 * Normalize angle to fall within [-180, 180]
+		 */
 		angle %= 360;
 		if (angle > 180) {
 			angle -= 360;
@@ -59,6 +77,9 @@ public class Driver {
 	}
 	
 	private boolean turningLeftFaster(double angle, double desired) {
+		/**
+		 * Determine whether it is faster to turn left or right to get from angle to desired
+		 */
 		double leftPosition = angle;
 		double rightPosition = angle;
 		for (int i = 0; i < 180; i++) {
@@ -75,7 +96,7 @@ public class Driver {
 		return true;
 	}
 	
-	public KalmanFilterLocalizer getCurrentPose() {
+	public Localizer getCurrentPose() {
 		return currentPose;
 	}
 }

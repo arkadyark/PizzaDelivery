@@ -1,25 +1,30 @@
 import lejos.hardware.motor.NXTRegulatedMotor;
 
+/***
+ * 
+ * Driver class for driving from one point to another in a straight line. 
+ * Updates position as it goes, and can be interrupted by an Interruptor (such as ObstacleDetector)
+ */
+
 public class PointToPointDriver extends Driver {
 	public Interruptor interruptor;
 	public double x, y, theta;
 	
-	public PointToPointDriver(KalmanFilterLocalizer currentPose, double[] targetPose, 
+	public PointToPointDriver(Localizer currentPose, double[] targetPose, 
 			NXTRegulatedMotor leftMotor, NXTRegulatedMotor rightMotor) {
 		this(currentPose, targetPose, leftMotor, rightMotor, null);
 	}
 	
-	public PointToPointDriver(KalmanFilterLocalizer currentPose, double targetPose[], 
+	public PointToPointDriver(Localizer currentPose, double targetPose[], 
 			NXTRegulatedMotor leftMotor, NXTRegulatedMotor rightMotor, Interruptor interruptor) {
 		super(currentPose, leftMotor, rightMotor);
 		
 		// Change in pose
 		x = targetPose[0] - currentPose.getPose()[0];
 		y = targetPose[1] - currentPose.getPose()[1];
-		theta = targetPose[2];
 		
 		// For theta, convert the angle to be between -180 and 180
-		theta = normalizeAngle(theta);
+		theta = normalizeAngle(targetPose[2]);
 		
 		this.interruptor = interruptor;
 	}
@@ -36,7 +41,7 @@ public class PointToPointDriver extends Driver {
 				if(interruptor.isFinished()) {
 					leftMotor.stop();
 					rightMotor.stop();
-					currentPose.updateDistance();
+					currentPose.updatePosition();
 					return false;
 				}
 			}
@@ -44,7 +49,8 @@ public class PointToPointDriver extends Driver {
 		
 		leftMotor.stop();
 		rightMotor.stop();
-		currentPose.updateDistance();
+		currentPose.updatePosition();
+		currentPose.updateAngle();
 		return true;
 	}
 

@@ -1,15 +1,20 @@
 import lejos.hardware.motor.NXTRegulatedMotor;
 import lejos.hardware.sensor.EV3GyroSensor;
-import lejos.utility.KalmanFilter;
 
-public class KalmanFilterLocalizer {
+/***
+ * 
+ * Class representing current pose. Provides implementation of updating pose.
+ *
+ */
+
+public class Localizer {
 	double currentPose[];
 	NXTRegulatedMotor leftMotor;
 	NXTRegulatedMotor rightMotor;
 	EV3GyroSensor gyro;
 	double tachoCount;
 	
-	public KalmanFilterLocalizer(double[] start, NXTRegulatedMotor leftMotor, NXTRegulatedMotor rightMotor,
+	public Localizer(double[] start, NXTRegulatedMotor leftMotor, NXTRegulatedMotor rightMotor,
 			EV3GyroSensor gyro) {
 		currentPose = start;
 		this.leftMotor = leftMotor;
@@ -19,11 +24,14 @@ public class KalmanFilterLocalizer {
 	}
 	
 	public void updateAngle() {
-		// If necessary, use a Kalman filter to update this
 		currentPose[2] = PizzaDeliveryUtils.getAngle(gyro);
 	}
 	
-	public void updateDistance() {
+	public void updatePosition() {
+		updatePosition(currentPose[2]);
+	}
+	
+	public void updatePosition(double angle) {
 		double tachoTicks = 0.5*(leftMotor.getTachoCount() + rightMotor.getTachoCount());
 		double tachoDifference = tachoTicks - tachoCount;
 		currentPose[0] += Math.cos(currentPose[2]/PizzaDeliveryUtils.RAD_TO_DEG)*tachoDifference/PizzaDeliveryUtils.DIST_TO_DEG;
@@ -35,12 +43,20 @@ public class KalmanFilterLocalizer {
 		return currentPose;
 	}
 	
-	public void setPose(double newPose[]) {
-		this.currentPose = newPose;
+	public double getAngle() {
+		return currentPose[2];
 	}
 
 	public void update() {
+		double previousAngle = currentPose[2] % 360;
 		updateAngle();
-		updateDistance();
+		double currentAngle = currentPose[2] % 360;
+		double average = getAverageAngle(previousAngle, currentAngle);
+		updatePosition(average);
+	}
+
+	private double getAverageAngle(double previousAngle, double currentAngle) {
+		// TODO: Implement properly averaging angle
+		return previousAngle;
 	}
 }

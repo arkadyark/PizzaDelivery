@@ -1,22 +1,23 @@
 import lejos.hardware.motor.NXTRegulatedMotor;
 import lejos.hardware.sensor.EV3ColorSensor;
 
-public class LineFollower {
-	/***
-	 * TODO:
-	 * - Tune P controller/put in tuning from Lab 3/4
-	 */
+/***
+ * 
+ * Class to drive along a line, uses a P controller
+ *
+ */
 
+public class LineFollower {
 	private NXTRegulatedMotor leftMotor;
 	private NXTRegulatedMotor rightMotor;
-	private KalmanFilterLocalizer currentPose;
+	private Localizer currentPose;
 	private EV3ColorSensor color;
 	private Interruptor interruptor;
 	
-	private static float desired = 0.12f;
-	private static float kP = 1500;
+	private static final float desired = 0.12f; // Color reading when we are 50% on the line
+	private static final float kP = 1200;
 
-	public LineFollower(KalmanFilterLocalizer currentPose, 
+	public LineFollower(Localizer currentPose, 
 			NXTRegulatedMotor rightMotor, NXTRegulatedMotor leftMotor, 
 			EV3ColorSensor color, Interruptor interruptor) {
 		this.currentPose = currentPose;
@@ -29,22 +30,23 @@ public class LineFollower {
 	public void driveUntilStopped() {
 		while (!interruptor.isFinished()){
 			float current = PizzaDeliveryUtils.getReflectedLight(color);
-			float error = (desired - current);			
+			float error = (desired - current);		
 			float correction = kP*error;
 			
-			leftMotor.setSpeed(Math.round(PizzaDeliveryUtils.SPEED + correction/2.0));
+			leftMotor.setSpeed(Math.round(PizzaDeliveryUtils.SPEED - correction/2.0));
+			rightMotor.setSpeed(Math.round(PizzaDeliveryUtils.SPEED + correction/2.0));
 			leftMotor.forward();
-			rightMotor.setSpeed(Math.round(PizzaDeliveryUtils.SPEED - correction/2.0));
 			rightMotor.forward();
 			
 			currentPose.update();
 		}
+		currentPose.update();
 		leftMotor.stop();
 		rightMotor.stop();
 		currentPose.update();
 	}
 
-	public KalmanFilterLocalizer getCurrentPose() {
+	public Localizer getCurrentPose() {
 		return currentPose;
 	}
 }

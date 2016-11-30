@@ -1,6 +1,12 @@
 import lejos.hardware.motor.NXTRegulatedMotor;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
 
+/***
+ * 
+ * Interruptor class that keeps a count of the number of houses that have been seen.
+ * Triggers an interrupt when we have arrived at the desired house.
+ */
+
 public class HouseCounter implements Interruptor {
 	private static final float HOUSE_THRESHOLD = 0.35f;
 	
@@ -10,7 +16,6 @@ public class HouseCounter implements Interruptor {
 	private NXTRegulatedMotor ultrasonicMotor;
 	private boolean seeingHouse;
 
-
 	public HouseCounter(int targetHouse, String deliverySide, EV3UltrasonicSensor ultrasonic, NXTRegulatedMotor ultrasonicMotor) {
 		this.targetHouse = targetHouse;
 		this.houseCount = 0;
@@ -18,6 +23,7 @@ public class HouseCounter implements Interruptor {
 		this.ultrasonicMotor = ultrasonicMotor;
 		this.seeingHouse = false;
 		
+		// Position ultrasonic sensor to see houses on the side we're interested in
 		if (deliverySide == "LEFT") {
 			ultrasonicMotor.rotateTo(-90);
 		} else if (deliverySide == "RIGHT") {
@@ -35,12 +41,13 @@ public class HouseCounter implements Interruptor {
 				seeingHouse = false;
 			}
 		} else if (distance <= HOUSE_THRESHOLD) {
-			// We're next to a house, and weren't before this
+			// We're next to a house, and weren't before this; increment count
 			seeingHouse = true;
 			houseCount++;
 		}
 		
 		if (houseCount == targetHouse + 1) { // + 1 because of the indicator pile
+			// We're at the house, trigger an interrupt
 			ultrasonicMotor.rotateTo(0);
 			return true;
 		} else {
