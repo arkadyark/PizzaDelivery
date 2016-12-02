@@ -14,7 +14,7 @@ public class LineFollower {
 	private EV3ColorSensor color;
 	private Interruptor interruptor;
 	
-	private static final float desired = 0.12f; // Color reading when we are 50% on the line
+	private static final float desired = 0.04f; // Color reading when we are 50% on the line
 	private static final float kP = 1200;
 
 	public LineFollower(Localizer currentPose, 
@@ -33,8 +33,8 @@ public class LineFollower {
 			float error = (desired - current);		
 			float correction = kP*error;
 			
-			leftMotor.setSpeed(Math.round(PizzaDeliveryUtils.SPEED - correction/2.0));
-			rightMotor.setSpeed(Math.round(PizzaDeliveryUtils.SPEED + correction/2.0));
+			leftMotor.setSpeed(Math.round(PizzaDeliveryUtils.SPEED + correction/2.0));
+			rightMotor.setSpeed(Math.round(PizzaDeliveryUtils.SPEED - correction/2.0));
 			leftMotor.forward();
 			rightMotor.forward();
 			

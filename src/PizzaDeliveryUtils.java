@@ -51,9 +51,9 @@ public class PizzaDeliveryUtils {
 		LCD.clearDisplay();
 
 		LCD.drawString(PizzaDelivery.status, 0, 0);
-		String poseString = "[" + Math.round(currentPose.getPose()[0]) + " " +
-				Math.round(currentPose.getPose()[1]) + " " +
-				Math.round(currentPose.getPose()[2]) + "]";
+		String poseString = "[" + Math.round(currentPose.getPose()[0]*10)/10.0 + " " +
+				Math.round(currentPose.getPose()[1]*10)/10.0 + " " +
+				Math.round(currentPose.getPose()[2]*10)/10.0 + "]";
 		LCD.drawString(poseString, 0, 1);
 	}
 	

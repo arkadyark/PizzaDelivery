@@ -25,11 +25,11 @@ public class ObstacleAvoider extends Driver {
 		ultrasonicMotor.rotateTo(-90);
 		float leftDistance = PizzaDeliveryUtils.getDistance(ultrasonic);
 		if (leftDistance > rightDistance) {
-			// More space on the left, turn left and look to our right
+			// There's more space on the left, turn left and look to our right
 			turn(90);
 			ultrasonicMotor.rotateTo(90);
 		} else {
-			// More space on the right, turn right and look to our left
+			// There's more space on the right, turn right and look to our left
 			turn(-90);
 			ultrasonicMotor.rotateTo(-90);
 		}
@@ -40,9 +40,10 @@ public class ObstacleAvoider extends Driver {
 		while (distanceToObstacle < CLEARANCE_THRESHOLD) {
 			distanceToObstacle = PizzaDeliveryUtils.getDistance(ultrasonic);
 		}
-		rightMotor.stop();
-		leftMotor.stop();
+		stop();
+		// Keep driving until cleared obstacle
+		straight(30);		
+		
 		ultrasonicMotor.rotateTo(0);
-		currentPose.updatePosition();
 	}
 }

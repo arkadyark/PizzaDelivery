@@ -145,7 +145,7 @@ public class PizzaDelivery {
 		while (!gotToTarget) {
 			ObstacleDetector obstacleDetector = new ObstacleDetector(ultrasonic);
 			PointToPointDriver driver = new PointToPointDriver(currentPose, START, leftMotor, rightMotor, obstacleDetector);
-			PizzaDeliveryUtils.displayStatus(currentPose, "driving along");
+			PizzaDeliveryUtils.displayStatus(currentPose, "driving home");
 			gotToTarget = driver.driveUntilStopped();
 			currentPose = driver.getCurrentPose();
 			if (gotToTarget) return;

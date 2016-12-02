@@ -11,6 +11,7 @@ public class Driver {
 	protected Localizer currentPose;
 	protected NXTRegulatedMotor leftMotor;
 	protected NXTRegulatedMotor rightMotor;
+	protected Interruptor interruptor;
 	
 	public Driver(Localizer currentPose, 
 			NXTRegulatedMotor leftMotor, NXTRegulatedMotor rightMotor) {
@@ -94,6 +95,36 @@ public class Driver {
 		
 		// Should never reach here
 		return true;
+	}
+
+
+	protected boolean straight(double distance){
+		double degrees = distance * PizzaDeliveryUtils.DIST_TO_DEG;
+		double startTachoCount = 0.5*(leftMotor.getTachoCount() + rightMotor.getTachoCount());
+		leftMotor.forward();
+		rightMotor.forward();
+		while(0.5*(leftMotor.getTachoCount() + rightMotor.getTachoCount()) - startTachoCount < degrees) {
+			currentPose.update();
+			PizzaDeliveryUtils.displayStatus(currentPose);
+			if(interruptor != null && interruptor.isFinished()) {
+				stop();
+				currentPose.updatePosition();
+				return false;
+			}
+		}
+		
+		stop();
+		currentPose.updatePosition();
+		return true;
+	}
+	
+	protected void stop() {
+		// Fix rotation caused by stopping wheels not at the same time
+		currentPose.updateAngle();
+		double angle = currentPose.getAngle();
+		leftMotor.stop();
+		rightMotor.stop();
+		turnTo(angle);
 	}
 	
 	public Localizer getCurrentPose() {

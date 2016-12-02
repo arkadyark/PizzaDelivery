@@ -16,7 +16,7 @@ public class Localizer {
 	
 	public Localizer(double[] start, NXTRegulatedMotor leftMotor, NXTRegulatedMotor rightMotor,
 			EV3GyroSensor gyro) {
-		currentPose = start;
+		currentPose = start.clone();
 		this.leftMotor = leftMotor;
 		this.rightMotor = rightMotor;
 		this.gyro = gyro;

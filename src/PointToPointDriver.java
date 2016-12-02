@@ -7,8 +7,8 @@ import lejos.hardware.motor.NXTRegulatedMotor;
  */
 
 public class PointToPointDriver extends Driver {
-	public Interruptor interruptor;
-	public double x, y, theta;
+	private double x, y, theta;
+	private double targetPose[];
 	
 	public PointToPointDriver(Localizer currentPose, double[] targetPose, 
 			NXTRegulatedMotor leftMotor, NXTRegulatedMotor rightMotor) {
@@ -22,6 +22,7 @@ public class PointToPointDriver extends Driver {
 		// Change in pose
 		x = targetPose[0] - currentPose.getPose()[0];
 		y = targetPose[1] - currentPose.getPose()[1];
+		this.targetPose = targetPose;
 		
 		// For theta, convert the angle to be between -180 and 180
 		theta = normalizeAngle(targetPose[2]);
@@ -29,36 +30,20 @@ public class PointToPointDriver extends Driver {
 		this.interruptor = interruptor;
 	}
 
-	private boolean straight(double degrees){
-		if(interruptor == null) {
-			rightMotor.rotate((int)Math.round(degrees), true);
-			leftMotor.rotate((int)Math.round(degrees));
-		} else {
-			int startTachoCount = leftMotor.getTachoCount();
-			leftMotor.forward();
-			rightMotor.forward();
-			while(leftMotor.getTachoCount() - startTachoCount < degrees) {
-				if(interruptor.isFinished()) {
-					leftMotor.stop();
-					rightMotor.stop();
-					currentPose.updatePosition();
-					return false;
-				}
-			}
-		}
-		
-		leftMotor.stop();
-		rightMotor.stop();
-		currentPose.updatePosition();
-		currentPose.updateAngle();
-		return true;
-	}
-
 	public boolean driveUntilStopped() {
 		double rise = Math.atan2(y, x)*PizzaDeliveryUtils.RAD_TO_DEG;
 		turnTo(rise);
-		boolean finished = straight(Math.pow((Math.pow(x,  2) + Math.pow(y, 2)), .5)*PizzaDeliveryUtils.DIST_TO_DEG);
+		boolean finished = straight(Math.pow((Math.pow(x,  2) + Math.pow(y, 2)), .5));
 		if (finished) {
+			x = targetPose[0] - currentPose.getPose()[0];
+			y = targetPose[1] - currentPose.getPose()[1];
+			double distanceToDesired = Math.pow((Math.pow(x,  2) + Math.pow(y, 2)), .5);
+			if (distanceToDesired > 3) {
+				rise = Math.atan2(y, x)*PizzaDeliveryUtils.RAD_TO_DEG;
+				turnTo(rise);
+				straight(Math.pow((Math.pow(x,  2) + Math.pow(y, 2)), .5));
+				currentPose.update();
+			}
 			turnTo(theta);
 		}
 		return finished;
