@@ -1,7 +1,6 @@
 import lejos.hardware.motor.Motor;
 import lejos.hardware.motor.NXTRegulatedMotor;
 import lejos.hardware.port.SensorPort;
-import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.hardware.sensor.EV3GyroSensor;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
 import lejos.utility.Delay;
@@ -17,7 +16,6 @@ public class PizzaDelivery {
 
 	// Define sensors
 	private static EV3UltrasonicSensor ultrasonic = new EV3UltrasonicSensor(SensorPort.S4);
-	private static EV3ColorSensor color = new EV3ColorSensor(SensorPort.S1);
 	private static EV3GyroSensor gyro = new EV3GyroSensor(SensorPort.S2);
 	
 	// Define actuators
@@ -79,7 +77,7 @@ public class PizzaDelivery {
 		rightMotor.rotate((int) Math.round(-10*PizzaDeliveryUtils.DIST_TO_DEG));
 		currentPose.update();
 		PizzaDeliveryUtils.displayStatus(currentPose, "grabbing");
-		armMotor.rotateTo(180);
+		armMotor.rotateTo(70);
 		PizzaDeliveryUtils.displayStatus(currentPose, "driving out");
 		leftMotor.rotate((int) Math.round(10*PizzaDeliveryUtils.DIST_TO_DEG), true);
 		rightMotor.rotate((int) Math.round(10*PizzaDeliveryUtils.DIST_TO_DEG));
@@ -110,7 +108,7 @@ public class PizzaDelivery {
 		PizzaDeliveryUtils.displayStatus(currentPose);
 		
 		HouseCounter houseCounter =  new HouseCounter(targetHouse, deliverySide, ultrasonic, ultrasonicMotor);
-		LineFollower follower = new LineFollower(currentPose, leftMotor, rightMotor, color, houseCounter);
+		LineFollower follower = new LineFollower(currentPose, leftMotor, rightMotor, roadCoords[2], houseCounter);
 		follower.driveUntilStopped();
 		currentPose = follower.getCurrentPose();
 	}
@@ -119,12 +117,10 @@ public class PizzaDelivery {
 		status = "TURNING TO HOUSE";
 		PizzaDeliveryUtils.displayStatus(currentPose, "house on the " + deliverySide.toLowerCase());
 		
-		Driver driver = null;
+		Driver driver = new Driver(currentPose, leftMotor, rightMotor);
 		if (deliverySide == "LEFT") {
-			driver = new Driver(currentPose, leftMotor, rightMotor);
 			driver.turn(-90);
 		} else if (deliverySide == "RIGHT") {
-			driver = new Driver(currentPose, leftMotor, rightMotor);
 			driver.turn(90);
 		}
 		currentPose.updateAngle();
@@ -154,6 +150,8 @@ public class PizzaDelivery {
 			obstacleAvoider.drivePastObstacle();
 			currentPose = obstacleAvoider.getCurrentPose();
 		}
+		
+		armMotor.rotateTo(0);
 	}
 
 	private void deliver() {

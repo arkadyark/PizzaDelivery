@@ -13,7 +13,7 @@ public class PizzaDeliveryUtils {
 	public static final double RAD_TO_DEG = 180/Math.PI; 
 	public static final double DIST_TO_DEG = 360/(Math.PI*5.5); // Conversion between centimeters traveled and wheel rotation degrees
 	public static final int SPEED = 200; // Speed used for driving straight
-	public static final int TURNING_SPEED = 50; // Speed used for turning
+	public static final int TURNING_SPEED = 40; // Speed used for turning
 	
 	public static float getDistance(EV3UltrasonicSensor ultrasonic) {
 		int sampleSize = ultrasonic.sampleSize();
@@ -24,9 +24,9 @@ public class PizzaDeliveryUtils {
 	
 	public static float getAngle(EV3GyroSensor gyro) {
 		/**
-		 * Average 30 samples from the gyroscope to get a more accurate angle reading
+		 * Average 50 samples from the gyroscope to get a more accurate angle reading
 		 */
-		float N = 30;
+		float N = 50;
 		float estimatedAngle = 0;
 		for (int i = 0; i < N; i++) {			
 			int sampleSize = gyro.sampleSize();
@@ -34,7 +34,7 @@ public class PizzaDeliveryUtils {
 			gyro.getAngleMode().fetchSample(angle, 0);
 			estimatedAngle += angle[0];
 		}
-		return estimatedAngle/N;
+		return estimatedAngle/N % 360;
 	}
 	
 	public static float getReflectedLight(EV3ColorSensor color) {
@@ -63,5 +63,11 @@ public class PizzaDeliveryUtils {
 		 */
 		displayStatus(pose);
 		LCD.drawString(other, 0, 2);
+	}
+
+	public static void displayMessage(String string) {
+		LCD.clearDisplay();
+		LCD.drawString(PizzaDelivery.status, 0, 0);
+		LCD.drawString(string, 0, 2);
 	}
 }

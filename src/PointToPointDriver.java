@@ -4,6 +4,7 @@ import lejos.hardware.motor.NXTRegulatedMotor;
  * 
  * Driver class for driving from one point to another in a straight line. 
  * Updates position as it goes, and can be interrupted by an Interruptor (such as ObstacleDetector)
+ * 
  */
 
 public class PointToPointDriver extends Driver {
@@ -39,12 +40,15 @@ public class PointToPointDriver extends Driver {
 			y = targetPose[1] - currentPose.getPose()[1];
 			double distanceToDesired = Math.pow((Math.pow(x,  2) + Math.pow(y, 2)), .5);
 			if (distanceToDesired > 3) {
+				// If we're not really close, try again to get closer
 				rise = Math.atan2(y, x)*PizzaDeliveryUtils.RAD_TO_DEG;
 				turnTo(rise);
 				straight(Math.pow((Math.pow(x,  2) + Math.pow(y, 2)), .5));
 				currentPose.update();
 			}
 			turnTo(theta);
+		} else {
+			stop();
 		}
 		return finished;
 	}

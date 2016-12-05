@@ -7,7 +7,7 @@ import lejos.hardware.motor.NXTRegulatedMotor;
  */
 
 public class Driver {
-	private static final double EPSILON = 1.0;
+	private static final double EPSILON = 0.5;
 	protected Localizer currentPose;
 	protected NXTRegulatedMotor leftMotor;
 	protected NXTRegulatedMotor rightMotor;
@@ -26,7 +26,9 @@ public class Driver {
 		 */
 		double currentAngle = normalizeAngle(currentPose.getAngle());
 		boolean leftFaster = turningLeftFaster(currentAngle, desired);
-		double distance = 360;
+		double distance1 = Math.abs(currentAngle - desired);
+		double distance2 = 360 - distance1;
+		double distance = Math.min(distance1, distance2);
 		
 		leftMotor.setSpeed(PizzaDeliveryUtils.TURNING_SPEED);
 		rightMotor.setSpeed(PizzaDeliveryUtils.TURNING_SPEED);
@@ -45,12 +47,11 @@ public class Driver {
 			currentAngle = normalizeAngle(currentPose.getAngle());
 			leftFaster = turningLeftFaster(currentAngle, desired);
 			
-			double distance1 = Math.abs(currentAngle - desired);
-			double distance2 = 360 - distance1;
+			distance1 = Math.abs(currentAngle - desired);
+			distance2 = 360 - distance1;
 			distance = Math.min(distance1, distance2);
 		}
-		currentPose.updateAngle();
-		leftMotor.stop();
+		leftMotor.stop(true);
 		rightMotor.stop();
 		currentPose.updateAngle();
 		leftMotor.setSpeed(PizzaDeliveryUtils.SPEED);
@@ -81,8 +82,9 @@ public class Driver {
 		/**
 		 * Determine whether it is faster to turn left or right to get from angle to desired
 		 */
-		double leftPosition = angle;
-		double rightPosition = angle;
+		double leftPosition = normalizeAngle(angle);
+		double rightPosition = normalizeAngle(angle);
+		desired = normalizeAngle(desired);
 		for (int i = 0; i < 180; i++) {
 			leftPosition = normalizeAngle(leftPosition + 1);
 			rightPosition = normalizeAngle(rightPosition - 1);
@@ -107,13 +109,10 @@ public class Driver {
 			currentPose.update();
 			PizzaDeliveryUtils.displayStatus(currentPose);
 			if(interruptor != null && interruptor.isFinished()) {
-				stop();
 				currentPose.updatePosition();
 				return false;
 			}
 		}
-		
-		stop();
 		currentPose.updatePosition();
 		return true;
 	}
@@ -122,7 +121,7 @@ public class Driver {
 		// Fix rotation caused by stopping wheels not at the same time
 		currentPose.updateAngle();
 		double angle = currentPose.getAngle();
-		leftMotor.stop();
+		leftMotor.stop(true);
 		rightMotor.stop();
 		turnTo(angle);
 	}

@@ -40,10 +40,9 @@ public class ObstacleAvoider extends Driver {
 		while (distanceToObstacle < CLEARANCE_THRESHOLD) {
 			distanceToObstacle = PizzaDeliveryUtils.getDistance(ultrasonic);
 		}
-		stop();
+		currentPose.updatePosition();
 		// Keep driving until cleared obstacle
-		straight(30);		
-		
+		straight(25);
 		ultrasonicMotor.rotateTo(0);
 	}
 }

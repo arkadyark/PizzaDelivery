@@ -28,10 +28,6 @@ public class Localizer {
 	}
 	
 	public void updatePosition() {
-		updatePosition(currentPose[2]);
-	}
-	
-	public void updatePosition(double angle) {
 		double tachoTicks = 0.5*(leftMotor.getTachoCount() + rightMotor.getTachoCount());
 		double tachoDifference = tachoTicks - tachoCount;
 		currentPose[0] += Math.cos(currentPose[2]/PizzaDeliveryUtils.RAD_TO_DEG)*tachoDifference/PizzaDeliveryUtils.DIST_TO_DEG;
@@ -48,15 +44,6 @@ public class Localizer {
 	}
 
 	public void update() {
-		double previousAngle = currentPose[2] % 360;
 		updateAngle();
-		double currentAngle = currentPose[2] % 360;
-		double average = getAverageAngle(previousAngle, currentAngle);
-		updatePosition(average);
-	}
-
-	private double getAverageAngle(double previousAngle, double currentAngle) {
-		// TODO: Implement properly averaging angle
-		return previousAngle;
 	}
 }

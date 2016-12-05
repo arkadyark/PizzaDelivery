@@ -1,5 +1,4 @@
 import lejos.hardware.motor.NXTRegulatedMotor;
-import lejos.hardware.sensor.EV3ColorSensor;
 
 /***
  * 
@@ -7,43 +6,37 @@ import lejos.hardware.sensor.EV3ColorSensor;
  *
  */
 
-public class LineFollower {
-	private NXTRegulatedMotor leftMotor;
-	private NXTRegulatedMotor rightMotor;
-	private Localizer currentPose;
-	private EV3ColorSensor color;
+public class LineFollower extends Driver {
 	private Interruptor interruptor;
 	
-	private static final float desired = 0.04f; // Color reading when we are 50% on the line
-	private static final float kP = 1200;
+	private double desired;
+	private static final float kP = 10;
 
 	public LineFollower(Localizer currentPose, 
-			NXTRegulatedMotor rightMotor, NXTRegulatedMotor leftMotor, 
-			EV3ColorSensor color, Interruptor interruptor) {
-		this.currentPose = currentPose;
-		this.leftMotor = leftMotor;
-		this.rightMotor = rightMotor;
-		this.color = color;
+			NXTRegulatedMotor leftMotor, NXTRegulatedMotor rightMotor, 
+			double desiredAngle, Interruptor interruptor) {
+		super(currentPose, leftMotor, rightMotor);
+		this.desired = desiredAngle;
 		this.interruptor = interruptor;
 	}
 
 	public void driveUntilStopped() {
-		while (!interruptor.isFinished()){
-			float current = PizzaDeliveryUtils.getReflectedLight(color);
-			float error = (desired - current);		
-			float correction = kP*error;
+		while (!interruptor.isFinished()) {
+			double current = normalizeAngle(currentPose.getAngle());
+			double error = (desired - current);
+			double correction = kP*error;
 			
-			leftMotor.setSpeed(Math.round(PizzaDeliveryUtils.SPEED + correction/2.0));
-			rightMotor.setSpeed(Math.round(PizzaDeliveryUtils.SPEED - correction/2.0));
+			leftMotor.setSpeed(Math.round(PizzaDeliveryUtils.SPEED - correction/2.0));
+			rightMotor.setSpeed(Math.round(PizzaDeliveryUtils.SPEED + correction/2.0));
 			leftMotor.forward();
 			rightMotor.forward();
 			
 			currentPose.update();
 		}
-		currentPose.update();
-		leftMotor.stop();
+		leftMotor.stop(true);
 		rightMotor.stop();
 		currentPose.update();
+		straight(7); // Line up with house
 	}
 
 	public Localizer getCurrentPose() {
