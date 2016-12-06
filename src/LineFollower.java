@@ -10,7 +10,7 @@ public class LineFollower extends Driver {
 	private Interruptor interruptor;
 	
 	private double desired;
-	private static final float kP = 10;
+	private static final float kP = 5;
 
 	public LineFollower(Localizer currentPose, 
 			NXTRegulatedMotor leftMotor, NXTRegulatedMotor rightMotor, 
@@ -26,20 +26,19 @@ public class LineFollower extends Driver {
 			double error = (desired - current);
 			double correction = kP*error;
 			
-			leftMotor.setSpeed(Math.round(PizzaDeliveryUtils.SPEED - correction/2.0));
-			rightMotor.setSpeed(Math.round(PizzaDeliveryUtils.SPEED + correction/2.0));
+			leftMotor.setSpeed(Math.round(PizzaDeliveryUtils.SPEED*0.5 - correction/2.0));
+			rightMotor.setSpeed(Math.round(PizzaDeliveryUtils.SPEED*0.5  + correction/2.0));
 			leftMotor.forward();
 			rightMotor.forward();
 			
 			currentPose.update();
 		}
+		currentPose.update();
 		leftMotor.stop(true);
 		rightMotor.stop();
 		currentPose.update();
-		straight(7); // Line up with house
-	}
-
-	public Localizer getCurrentPose() {
-		return currentPose;
+		straight(10); // Line up with house
+		currentPose.update();
 	}
 }
+

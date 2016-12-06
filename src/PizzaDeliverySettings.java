@@ -8,8 +8,8 @@ import lejos.hardware.lcd.LCD;
  */
 
 public class PizzaDeliverySettings {
-	private static final double[] LEFT_PIZZA_COORDS = {8.3, 39.0, -90};
-	private static final double[] RIGHT_PIZZA_COORDS = {8.3, -39.0, 90};
+	private static final double[] LEFT_PIZZA_COORDS = {9.0, 39.0, -90};
+	private static final double[] RIGHT_PIZZA_COORDS = {9.0, -39.0, 90};
 	private static final double[] LEFT_ROAD_START_COORDS = {219, 39, 30};
 	private static final double[] CENTER_ROAD_START_COORDS = {216, 0, 0};
 	private static final double[] RIGHT_ROAD_START_COORDS = {219, -39, -30};

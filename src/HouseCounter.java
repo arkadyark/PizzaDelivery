@@ -8,7 +8,7 @@ import lejos.hardware.sensor.EV3UltrasonicSensor;
  */
 
 public class HouseCounter implements Interruptor {
-	private static final float HOUSE_THRESHOLD = 0.45f;
+	private static final float HOUSE_THRESHOLD = 0.5f;
 	
 	private int targetHouse;
 	private int houseCount = 0;
@@ -36,7 +36,7 @@ public class HouseCounter implements Interruptor {
 		float distance = PizzaDeliveryUtils.getDistance(ultrasonic);
 		PizzaDeliveryUtils.displayMessage("House count: " + Integer.toString(houseCount));
 		if (seeingHouse) {
-			if (distance > HOUSE_THRESHOLD + 5) {
+			if (distance > HOUSE_THRESHOLD) {
 				// We've moved past the house, allow ourselves to detect more houses
 				seeingHouse = false;
 			}
